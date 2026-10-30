@@ -1,0 +1,15 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import PracticeQuiz from '../../components/PracticeQuiz.jsx';
+import siteData from '../../data/site-data.json';
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+export function getStaticPaths() {
+  return siteData.chapters.map((chapter) => ({ params: { chapter: String(chapter.id) }, props: { chapter: chapter.id } }));
+}
+
+const { chapter } = Astro.props;
+---
+<SiteLayout title="Practice · ComArc Exam Lab" currentLabel="Practice Lab" mode="practice" chapter={chapter}>
+  <PracticeQuiz chapter={chapter} basePath={basePath} client:load />
+</SiteLayout>

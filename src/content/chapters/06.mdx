@@ -1,0 +1,233 @@
+import { PipelineControlExplorer } from '../../components/SimulatorIslands.jsx';
+import ChapterCompletion from '../../components/ChapterCompletion.jsx';
+import SvgBlock from '../../components/SvgBlock.jsx';
+import SourceFigure from '../../components/SourceFigure.jsx';
+import MathBlock from '../../components/MathBlock.jsx';
+
+export const chapterInfo = {
+  "id": 6,
+  "title": "ข้อ 6: Pipeline Registers และ Control Signals",
+  "subtitle": "10 คะแนน · รูปที่ 5 · อธิบายกลไกการส่งต่อ Control",
+  "short": "Pipeline Registers และ Control Signals",
+  "icon": "06",
+  "sections": [
+    {
+      "id": "ch6-section-1",
+      "title": "6.1 ทำไมใช้ Control จาก ID ตรง ๆ ไม่ได้?"
+    },
+    {
+      "id": "ch6-section-2",
+      "title": "6.2 Pipeline Register ต่างจาก Register File อย่างไร?"
+    },
+    {
+      "id": "ch6-section-3",
+      "title": "6.3 Control เดินทางผ่าน Pipeline อย่างไร?"
+    },
+    {
+      "id": "ch6-section-4",
+      "title": "6.4 ติดตาม lw ผ่าน Pipeline ทีละ Clock"
+    },
+    {
+      "id": "ch6-section-5",
+      "title": "6.5 Interactive: ตาม Control ของ Instruction แต่ละตัว"
+    },
+    {
+      "id": "ch6-section-6",
+      "title": "6.6 ดูรูปที่ 5 ของข้อสอบจริง"
+    },
+    {
+      "id": "ch6-section-7",
+      "title": "6.7 ตัวอย่างคำตอบข้อสอบ"
+    }
+  ]
+};
+export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+<h1 className="hero-title">ข้อ 6: Pipeline Registers และ Control Signals</h1>
+
+10 คะแนน · รูปที่ 5 · อธิบายกลไกการส่งต่อ Control
+
+ข้อ 6 เชื่อมสิ่งที่เรียนในข้อ 3 กับข้อ 5 เข้าด้วยกัน
+
+ข้อ 3 เราใช้ Main Control เลือกว่าใน State นี้ต้องเปิดอุปกรณ์และเลือกทางเดินข้อมูลอย่างไร
+
+ข้อ 5 เราพบว่า Pipeline สามารถทำหลาย Instruction พร้อมกันในคนละ Stage
+
+**ปัญหาคือ Main Control มีเพียงชุดเดียวใน ID Stage แล้ว EX, MEM และ WB รู้ได้อย่างไรว่าต้องใช้ Control ของ Instruction ตัวไหน?**
+
+<section className="lesson-section" id="ch6-section-1">
+
+## 6.1 ทำไมใช้ Control จาก ID ตรง ๆ ไม่ได้?
+
+สมมติ Instruction สามตัวเป็น
+
+```mips
+I1: lw  $t0, 0($s1)
+I2: add $t2, $t3, $t4
+I3: sw  $t5, 4($s1)
+```
+
+ใน Clock 4
+
+ตอนนี้ Main Control กำลัง Decode `sw` แต่ `lw` ที่อยู่ MEM ต้องอ่าน Memory
+
+ถ้าส่ง Control ของ `sw` ไปยัง MEM โดยตรง จะเกิดความผิดพลาด เพราะ `sw` ต้องการ MemWrite แต่ `lw` ต้องการ MemRead
+
+CPU จึงต้องเก็บ Control Signals ของแต่ละ Instruction เอาไว้แล้วส่งต่อผ่าน **Pipeline Registers**
+
+</section>
+
+<section className="lesson-section" id="ch6-section-2">
+
+## 6.2 Pipeline Register ต่างจาก Register File อย่างไร?
+
+| Register File | Pipeline Register |
+|--------|--------|
+| เก็บค่าของโปรแกรม เช่น `$t0` | เก็บข้อมูลที่เดินทางข้าม Stage |
+| มีหมายเลข Register | อยู่ระหว่าง Pipeline Stages |
+| อ่านและเขียนตามคำสั่ง | รับและส่ง Data/Control ตาม Clock |
+| ค่ายังคงอยู่จนถูกเขียนใหม่ | เปลี่ยนไปตาม Instruction ที่ไหลผ่าน |
+
+Pipeline Register เก็บทั้ง Operand, ผลคำนวณ, หมายเลข Register ปลายทาง และ Control Signals ที่จำเป็นสำหรับ Stage ถัดไป
+
+</section>
+
+<section className="lesson-section" id="ch6-section-3">
+
+## 6.3 Control เดินทางผ่าน Pipeline อย่างไร?
+
+Main Control สร้าง Control ใน ID แล้วแบ่งเป็นสามกลุ่ม
+
+| กลุ่ม | ตัวอย่าง | ใช้ที่ |
+|--------|--------|--------|
+| EX | ALUSrc, ALUOp, RegDst | EX |
+| M | MemRead, MemWrite, Branch | MEM |
+| WB | RegWrite, MemToReg | WB |
+
+**ID: Main Control**
+
+สร้าง EX, M, WB Controls
+
+**ID/EX Register**
+
+**EX ใช้ EX Controls**
+
+**EX/MEM Register**
+
+**MEM ใช้ M Controls**
+
+**MEM/WB Register**
+
+**WB**
+
+**WB ใช้ WB Controls**
+
+ทำไมสัญญาณจึงค่อย ๆ ลดลง?
+
+เพราะเมื่อ EX ใช้ EX Controls ไปแล้ว ก็ไม่จำเป็นต้องส่ง EX Controls ไปถึง MEM และ WB
+
+แต่ M และ WB ยังต้องถูกเก็บต่อเพื่อให้ Instruction เดียวกันทำงานในอนาคตได้ถูกต้อง
+
+</section>
+
+<section className="lesson-section" id="ch6-section-4">
+
+## 6.4 ติดตาม `lw` ผ่าน Pipeline ทีละ Clock
+
+สมมติ `lw` เป็น I1
+
+**Clock 2: ID**
+
+Main Control สร้าง Control สำหรับ `lw` เช่น
+
+- EX: ALUSrc=1, ALUOp=00
+- M: MemRead=1, MemWrite=0
+- WB: RegWrite=1, MemToReg=1
+
+สัญญาณทั้งหมดถูกบันทึกใน ID/EX Register
+
+**Clock 3: EX**
+
+`lw` คำนวณ Memory Address โดยใช้ EX Controls
+
+แล้วส่ง M และ WB Controls ผ่าน EX/MEM Register
+
+**Clock 4: MEM**
+
+ตอนนี้ `lw` ใช้ `MemRead=1` จาก EX/MEM Register เพื่ออ่าน Memory
+
+แม้ Main Control ใน ID จะกำลัง Decode `sw` อยู่ก็ตาม
+
+**Clock 5: WB**
+
+`lw` ใช้ RegWrite และ MemToReg จาก MEM/WB Register เพื่อเขียนค่าที่อ่านได้ลง Register ปลายทาง
+
+</section>
+
+<section className="lesson-section" id="ch6-section-5">
+
+## 6.5 Interactive: ตาม Control ของ Instruction แต่ละตัว
+
+<PipelineControlExplorer client:load />
+
+เลือก Clock 4 และ I1 จะเห็น `lw` อยู่ MEM และใช้ MemRead=1 ขณะที่ I3 อยู่ ID
+
+นี่แสดงให้เห็นว่าการทำงานของ Main Control ใน Clock ปัจจุบันไม่ได้ทับ Control ของ Instruction เก่าที่เดินทางไปยัง Stage ถัดไปแล้ว
+
+</section>
+
+<section className="lesson-section" id="ch6-section-6">
+
+## 6.6 ดูรูปที่ 5 ของข้อสอบจริง
+
+<SourceFigure client:load src={`${basePath}/images/fe2019b_q6_figure5.png`} alt="Pipeline Machine จากรูปที่ 5 ของข้อสอบ" openLabel="เปิดรูปที่ 5 ขนาดเต็ม" aspectRatio="1.566" />
+
+สังเกตสี่ส่วนนี้ในรูป
+
+| จุด | สิ่งที่เก็บหรือทำ |
+|--------|--------|
+| Main Control ที่ ID | สร้าง Control จาก Instruction |
+| ID/EX | Data และ EX, M, WB Controls |
+| EX/MEM | ผล ALU, Data ที่ต้องใช้ต่อ และ M, WB Controls |
+| MEM/WB | ผลจาก Memory/ALU และ WB Controls |
+
+**แล้ว Hazard Detection กับ Forwarding Unit ล่ะ?**
+
+สองวงจรนี้ไม่ได้สร้าง Main Control ของทุก Instruction ใหม่
+
+Hazard Detection ช่วยควบคุม Stall และ Flush เช่นระงับการเคลื่อนข้อมูลหรือทำให้ Control ของ Bubble เป็นค่าที่ไม่ก่อให้เกิดการเขียนผิด
+
+Forwarding Unit ช่วยเลือกข้อมูลที่พร้อมแล้วจาก Stage ที่อยู่ข้างหน้า ส่งกลับไปให้ Instruction ที่ต้องใช้ข้อมูลนั้น
+
+</section>
+
+<section className="lesson-section" id="ch6-section-7">
+
+## 6.7 ตัวอย่างคำตอบข้อสอบ
+
+> Main Control สร้าง Control Signals ของ Instruction ใน ID Stage แล้วเก็บส่งต่อพร้อมข้อมูลผ่าน Pipeline Registers โดย ID/EX เก็บ EX, M และ WB Controls เมื่อ Instruction เข้าสู่ EX จะใช้ EX Controls และส่ง M, WB ต่อผ่าน EX/MEM จากนั้น MEM ใช้ M Controls และส่ง WB ต่อผ่าน MEM/WB จนถึง WB Stage ทำให้แต่ละ Stage ได้รับสัญญาณที่ตรงกับ Instruction ของตัวเอง แม้มีหลาย Instruction ทำงานพร้อมกัน
+
+**Mental Model\:** Main Control สร้าง Control หนึ่งครั้งต่อ Instruction ใน ID แล้ว Pipeline Registers เก็บและส่ง Control ไปกับ Instruction นั้นจนเสร็จงาน
+
+---
+
+# เชื่อมทั้ง 6 ข้อเข้าด้วยกัน
+
+แกนหลักที่ใช้ทวนก่อนสอบคือการแยก **Data, Operation, Control และ Time** ให้ออก
+
+Data คือค่าที่เดินทางในวงจร, Operation คือสิ่งที่ ALU หรืออุปกรณ์ต้องทำ, Control คือสัญญาณที่เลือกการทำงาน และ Time คือ State หรือ Pipeline Stage ที่กำลังเกิดขึ้น
+
+เมื่อแยกสี่อย่างนี้ได้ ข้อ 2–6 จะไม่ใช่การจำตารางและสายจำนวนมาก แต่เป็นการติดตามว่าคำสั่งหนึ่งต้องทำอะไรให้สำเร็จ และ CPU ต้องจัดการอย่างไรเพื่อให้ได้ผลนั้น
+
+---
+
+If you want, I can:
+
+- Explore detailed examples of overflow detection
+- Analyze ALU control signals for various operations
+- Walk through ALU subtraction using two's complement
+
+</section>
+
+<ChapterCompletion client:load chapter={6} basePath={basePath} />
+<div className="lesson-nav"><a href={`${basePath}/study/5/`}>← ข้อ 5</a><a href={`${basePath}/study/1/`}>ข้อ 1 →</a></div>

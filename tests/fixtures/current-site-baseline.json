@@ -1,0 +1,248 @@
+{
+  "chapters": [
+    {
+      "id": 1,
+      "title": "Binary Arithmetic",
+      "lede": "เริ่มจากวิธีเก็บจำนวนในฮาร์ดแวร์: ทำไมเลขฐานสองเหมือนกันจึงตีความต่างกัน และเมื่อไรจึงเกิด Overflow",
+      "sections": [
+        {
+          "id": "representation",
+          "title": "1. Signed กับ Unsigned ต่างกันตรงไหน?"
+        },
+        {
+          "id": "addition",
+          "title": "2. บวกเลขฐานสองทีละบิต"
+        },
+        {
+          "id": "overflow",
+          "title": "3. ตรวจ Overflow อย่างไร?"
+        },
+        {
+          "id": "addition-explorer",
+          "title": "4. ทดลองเลขของโจทย์ทั้ง 8 ข้อ"
+        },
+        {
+          "id": "addition-solutions",
+          "title": "5. เฉลยข้อ 1.1–1.8"
+        }
+      ],
+      "text_sha256": "a97a2820d75b7c4868e35a48e0c8359cd5b3b8acd53fefcc3f6520daff5a6785",
+      "text_chars": 2856,
+      "svg_sha256": [],
+      "static_svg_sha256": []
+    },
+    {
+      "id": 2,
+      "title": "ALU Control",
+      "lede": "จากการบวกเลขฐานสอง มาดูว่า ALU เดียวกันสามารถเลือกทำ ADD, SUB, AND, OR, NOR และ SLT ได้อย่างไร",
+      "sections": [
+        {
+          "id": "alu-purpose",
+          "title": "1. ALU คืออะไร?"
+        },
+        {
+          "id": "alu-sub",
+          "title": "2. ทำไม SUB ใช้วงจร ADD?"
+        },
+        {
+          "id": "alu-nor",
+          "title": "3. NOR ใช้ De Morgan"
+        },
+        {
+          "id": "alu-slt",
+          "title": "4. SLT และ Signed Overflow"
+        },
+        {
+          "id": "alu-control",
+          "title": "5. ALUOp, Funct และ Operation ไม่ใช่สิ่งเดียวกัน"
+        },
+        {
+          "id": "alu-answers",
+          "title": "6. เฉลยตารางที่ 1"
+        }
+      ],
+      "text_sha256": "b28f626fa6385073113e6f489319db05bb6b3dad148300784b724740ef6d92ba",
+      "text_chars": 2990,
+      "svg_sha256": [
+        "02f61555ecb26275d8e261a32e4c3b5a3e25307ee464c9c4e8484634588e0016",
+        "88449bd4165e3d9dbafcff0fbd30a31b74d74c390d624720a25d3b66ee5e771d",
+        "a5b20ec25d610bf5c79ce5968045fa84bc466f9295e724316b92178834a40679",
+        "319ba86d06922dae5040cf42d0ab82abfcbfb14d9f9a90afa15ad3e82e7b185b",
+        "208acb5361e4d812ddcf61aa701d595f9a1e108f15682f550b892296adf4cd3f"
+      ],
+      "static_svg_sha256": [
+        "02f61555ecb26275d8e261a32e4c3b5a3e25307ee464c9c4e8484634588e0016",
+        "88449bd4165e3d9dbafcff0fbd30a31b74d74c390d624720a25d3b66ee5e771d",
+        "a5b20ec25d610bf5c79ce5968045fa84bc466f9295e724316b92178834a40679",
+        "319ba86d06922dae5040cf42d0ab82abfcbfb14d9f9a90afa15ad3e82e7b185b",
+        "208acb5361e4d812ddcf61aa701d595f9a1e108f15682f550b892296adf4cd3f"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Multicycle Datapath",
+      "lede": "โจทย์แกนสำคัญ: เปลี่ยนการกระทำในแต่ละ State ให้เป็น Control Signals ของ CPU โดยใช้วิธีสองโซน",
+      "sections": [
+        {
+          "id": "hardware",
+          "title": "1. ก่อนเลือก Control ต้องรู้จักอุปกรณ์"
+        },
+        {
+          "id": "mux",
+          "title": "2. MUX คือสวิตช์เลือก Data"
+        },
+        {
+          "id": "zones",
+          "title": "3. แบ่งการคิดเป็นสองโซน"
+        },
+        {
+          "id": "fetch",
+          "title": "4. State 0 เหมือนกันทุก Instruction"
+        },
+        {
+          "id": "lw-example",
+          "title": "5. Worked Example: lw แบบเต็ม"
+        },
+        {
+          "id": "others",
+          "title": "6. วิธีคิดสำหรับคำสั่งที่เหลือ"
+        },
+        {
+          "id": "control-explorer",
+          "title": "7. ลองเลือก Instruction และ State เอง"
+        },
+        {
+          "id": "control-table",
+          "title": "8. เฉลยตารางที่ 3 และ 4 ทั้งหมด"
+        }
+      ],
+      "text_sha256": "20185feddee43edccbc06b8372f20befd54c6098861e87242125c710692dab7d",
+      "text_chars": 6818,
+      "svg_sha256": [
+        "11ffd9042726f2fd7ede77428353a093bba2d0bff29b9ac5203d0c5d9ba7f7b8",
+        "3db8b3a5ae57c4242c83d5a7c0a2e07d3c20c0ba518a59a52c23ed994b10bafb",
+        "c7c9e0743b38a6df24c3c41aea8d2ecf628db0fc12202f21f339ab8153f82958",
+        "cff1e8136c708cd2bd2199023ee9aaa2258501d7386210dc28495fe03b20c9a3",
+        "3210734f81503232484127dfb9a74f35bdfa7a8d7627789a3b76a8c3001dad45"
+      ],
+      "static_svg_sha256": [
+        "11ffd9042726f2fd7ede77428353a093bba2d0bff29b9ac5203d0c5d9ba7f7b8",
+        "3db8b3a5ae57c4242c83d5a7c0a2e07d3c20c0ba518a59a52c23ed994b10bafb",
+        "c7c9e0743b38a6df24c3c41aea8d2ecf628db0fc12202f21f339ab8153f82958",
+        "cff1e8136c708cd2bd2199023ee9aaa2258501d7386210dc28495fe03b20c9a3"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Barrel Shifter",
+      "lede": "โจทย์ให้ต่อสายจริงระหว่าง Instruction Register, Register File และ Barrel Shifter เพื่อรองรับคำสั่ง srl",
+      "sections": [
+        {
+          "id": "shift-basics",
+          "title": "1. SRL เลื่อนบิตอย่างไร?"
+        },
+        {
+          "id": "shifter-levels",
+          "title": "2. ทำไม Barrel Shifter มี 5 ระดับ?"
+        },
+        {
+          "id": "instruction-fields",
+          "title": "3. IR ส่งหมายเลข Register ไม่ใช่ค่าข้างใน"
+        },
+        {
+          "id": "wiring",
+          "title": "4. วาดสายเชื่อมอุปกรณ์ทีละจุด"
+        }
+      ],
+      "text_sha256": "1b277216da65667c9371c742fec62540575a3cdeefef00cf3f6b3fce7955ff8b",
+      "text_chars": 3225,
+      "svg_sha256": [
+        "afdd0ebfceb24765f2c1eeddaff8413afc3958ba125e7c55af771bc6834d2714"
+      ],
+      "static_svg_sha256": [
+        "afdd0ebfceb24765f2c1eeddaff8413afc3958ba125e7c55af771bc6834d2714"
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Pipeline & Hazards",
+      "lede": "Pipeline ช่วยเพิ่ม Throughput แต่เมื่อหลายคำสั่งทำงานพร้อมกันก็ต้องระวังการแย่งทรัพยากร การรอข้อมูล และ Branch",
+      "sections": [
+        {
+          "id": "pipeline-stages",
+          "title": "1. Pipeline 5 Stages ทำอะไรบ้าง?"
+        },
+        {
+          "id": "pipeline-time",
+          "title": "2. ข้อ 5.1: เวลา Pipeline คำนวณอย่างไร?"
+        },
+        {
+          "id": "hazard-types",
+          "title": "3. Hazard คืออะไร?"
+        },
+        {
+          "id": "forwarding",
+          "title": "4. ข้อ 5.4–5.5: Data Hazard และ Forwarding"
+        },
+        {
+          "id": "load-use",
+          "title": "5. ข้อ 5.6–5.7: ทำไม lw ต้อง Stall?"
+        },
+        {
+          "id": "scheduling",
+          "title": "6. ข้อ 5.8: Instruction Scheduling"
+        },
+        {
+          "id": "pipeline-solutions",
+          "title": "7. เฉลยข้อ 5.1–5.10"
+        }
+      ],
+      "text_sha256": "2cb5028384d36e5013c41e542c93859565e9fe182beaeecf8b18d1b78b6259ff",
+      "text_chars": 4919,
+      "svg_sha256": [
+        "e89b55d99d4c2c46a75757864ec84fc60ffe5dd699105ba3bb87822921732944",
+        "6a191c9170d1c7dddbe778c2539b57953af59c5eb853bc06fc50e65280674b53",
+        "d89433b21f939f547fbb38a785edcaef64c4357b17dbea429c8e8dba6b66fd4e"
+      ],
+      "static_svg_sha256": [
+        "e89b55d99d4c2c46a75757864ec84fc60ffe5dd699105ba3bb87822921732944",
+        "d89433b21f939f547fbb38a785edcaef64c4357b17dbea429c8e8dba6b66fd4e"
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Pipeline Registers",
+      "lede": "เมื่อหลาย Instruction ทำงานพร้อมกัน Main Control ที่อยู่ ID เพียงตัวเดียวจะส่ง Control ให้ EX, MEM และ WB อย่างถูกต้องได้อย่างไร?",
+      "sections": [
+        {
+          "id": "control-problem",
+          "title": "1. ปัญหาของ Main Control ที่มีเพียงตัวเดียว"
+        },
+        {
+          "id": "pipeline-registers",
+          "title": "2. Pipeline Registers เก็บอะไร?"
+        },
+        {
+          "id": "control-groups",
+          "title": "3. แบ่ง EX / M / WB Controls ทำไม?"
+        },
+        {
+          "id": "instruction-walk",
+          "title": "4. เดินตาม lw ทีละ Clock"
+        },
+        {
+          "id": "hazard-forward",
+          "title": "5. Hazard Detection กับ Forwarding เกี่ยวอย่างไร?"
+        },
+        {
+          "id": "pipeline-essay",
+          "title": "6. คำตอบข้อสอบข้อ 6"
+        }
+      ],
+      "text_sha256": "9cd06f8f20598421093942c3d3a99958143f6fc43541ac59042df013e8e5340f",
+      "text_chars": 4043,
+      "svg_sha256": [],
+      "static_svg_sha256": []
+    }
+  ]
+}

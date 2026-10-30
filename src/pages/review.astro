@@ -1,0 +1,8 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import ProgressReview from '../components/ProgressReview.jsx';
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<SiteLayout title="Progress · ComArc Exam Lab" currentLabel="Progress" mode="review">
+  <ProgressReview basePath={basePath} client:load />
+</SiteLayout>

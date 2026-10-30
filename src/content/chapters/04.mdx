@@ -1,0 +1,176 @@
+import { ShifterExplorer } from '../../components/SimulatorIslands.jsx';
+import ChapterCompletion from '../../components/ChapterCompletion.jsx';
+import SvgBlock from '../../components/SvgBlock.jsx';
+import SourceFigure from '../../components/SourceFigure.jsx';
+import MathBlock from '../../components/MathBlock.jsx';
+
+export const chapterInfo = {
+  "id": 4,
+  "title": "ข้อ 4: Barrel Shifter และ SRL Datapath",
+  "subtitle": "10 คะแนน · รูปที่ 3 · วาดสายเชื่อมต่อ",
+  "short": "Barrel Shifter และ SRL Datapath",
+  "icon": "04",
+  "sections": [
+    {
+      "id": "ch4-section-1",
+      "title": "4.1 เริ่มจากโจทย์ต้องการอะไร"
+    },
+    {
+      "id": "ch4-section-2",
+      "title": "4.2 Barrel Shifter ทำไมมี 5 MUX?"
+    },
+    {
+      "id": "ch4-section-3",
+      "title": "4.3 Interactive: ดูการทำงานแต่ละ MUX"
+    },
+    {
+      "id": "ch4-section-4",
+      "title": "4.4 ทำไม IR ต้องต่อไปยัง Register File?"
+    },
+    {
+      "id": "ch4-section-5",
+      "title": "4.5 วาดสายทีละเส้น"
+    },
+    {
+      "id": "ch4-section-6",
+      "title": "4.6 ภาพเฉลยต่อสายบนข้อสอบจริง"
+    }
+  ]
+};
+export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+<h1 className="hero-title">ข้อ 4: Barrel Shifter และ SRL Datapath</h1>
+
+10 คะแนน · รูปที่ 3 · วาดสายเชื่อมต่อ
+
+ข้อ 3 ใช้ Control เลือกทางเดินของข้อมูลในวงจรที่กำหนดไว้ ส่วนข้อ 4 ต้อง **วาดสายเชื่อมต่ออุปกรณ์เอง** เพื่อให้ CPU ทำคำสั่ง `srl` ได้
+
+<section className="lesson-section" id="ch4-section-1">
+
+## 4.1 เริ่มจากโจทย์ต้องการอะไร
+
+```mips
+srl $t0, $t1, 3
+```
+
+คำสั่ง SRL (Shift Right Logical) หมายถึงนำค่าจาก `$t1` เลื่อนบิตไปทางขวา 3 ตำแหน่ง แล้วเก็บผลใน `$t0`
+
+สมมติ `$t1 = 40`
+
+ดูการ Shift ด้วยตัวเลข 8-bit ก่อน
+
+ก่อน Shift: 40
+
+เลื่อนขวา 3 บิต เติม 0 ทางซ้าย
+
+หลัง Shift: 5
+
+สำหรับเลขไม่ติดลบ การ Shift Right n บิตเทียบได้กับหารด้วย \(2^n\) แล้วปัดเศษลง แต่ SRL เป็นการเลื่อนบิต ไม่ใช่คำสั่งหาร
+
+</section>
+
+<section className="lesson-section" id="ch4-section-2">
+
+## 4.2 Barrel Shifter ทำไมมี 5 MUX?
+
+โจทย์ให้ Barrel Shifter ที่ประกอบด้วย MUX ห้าระดับ แต่ละระดับเลือกว่าใช้ค่าเดิมหรือค่าที่เลื่อนแล้ว
+
+| MUX | Control=1 ทำอะไร |
+|--------|--------|
+| s0 | Shift ขวา 1 bit |
+| s1 | Shift ขวา 2 bits |
+| s2 | Shift ขวา 4 bits |
+| s3 | Shift ขวา 8 bits |
+| s4 | Shift ขวา 16 bits |
+
+เหตุผลที่ใช้ 1, 2, 4, 8, 16 เพราะรวมกันให้เป็นค่าใดก็ได้ระหว่าง 0–31
+
+เช่น ต้องการ Shift 13 บิต
+
+<MathBlock tex={"13=8+4+1=01101_2"} />
+
+จึงเปิด s3, s2, s0 ส่วน s1, s4 ปล่อยค่าเดิมผ่านไป
+
+</section>
+
+<section className="lesson-section" id="ch4-section-3">
+
+## 4.3 Interactive: ดูการทำงานแต่ละ MUX
+
+<ShifterExplorer client:load />
+
+</section>
+
+<section className="lesson-section" id="ch4-section-4">
+
+## 4.4 ทำไม IR ต้องต่อไปยัง Register File?
+
+Instruction แบบ MIPS R-format แบ่งเป็นช่องดังนี้
+
+เช่น `srl $t0,$t1,3`
+
+- `rt` ระบุ Register `$t1` หมายเลข 9
+- `rd` ระบุ Register `$t0` หมายเลข 8
+- `shamt` เก็บ 3 ในรูป `00011`
+
+**อย่าสับสนเลข Register กับข้อมูลใน Register**
+
+IR ส่งหมายเลข Register 9 ไปยัง Register File เพื่ออ่านค่าที่อยู่ข้างใน ซึ่งสมมติว่าเป็น 40
+
+หมายความว่าสายจาก IR เป็น 5-bit แต่สายที่ส่งข้อมูลจริงจาก Register File เป็น 32-bit
+
+</section>
+
+<section className="lesson-section" id="ch4-section-5">
+
+## 4.5 วาดสายทีละเส้น
+
+ต้องให้ Data เดินทางดังนี้
+
+**IR<MathBlock tex={"20:16"} /> = rt**
+
+เลือก Register ต้นทาง
+
+**Register File: Read register 2**
+
+อ่าน Data จริงออกทาง Read data 2
+
+**Barrel Shifter**
+
+Data in → เลื่อนตาม shamt → Data out
+
+**Register File: Write data**
+
+เก็บลง rd เมื่อ RegWrite=1
+
+ต้องมีสายควบคุมเพิ่มเติมจาก `IR[6:10]` ไปยัง s0–s4 ตาม Bit Position จริง คือ IR<MathBlock tex={"6"} /> ไป s0, IR<MathBlock tex={"7"} /> ไป s1 ต่อไปจนถึง IR<MathBlock tex={"10"} /> ไป s4
+
+</section>
+
+<section className="lesson-section" id="ch4-section-6">
+
+## 4.6 ภาพเฉลยต่อสายบนข้อสอบจริง
+
+<SourceFigure client:load src={`${basePath}/images/fe2019b_q4_srl_wired.png`} alt="เฉลยข้อ 4 SRL Datapath พร้อมสายสี" openLabel="เปิดภาพขนาดเต็ม" aspectRatio="1.169" />
+
+ตารางนี้ช่วยเทียบสีบนภาพกับความหมายของสาย
+
+| สาย | จำนวนบิต | หน้าที่ |
+|--------|--------|--------|
+| IR<MathBlock tex={"20:16"} /> → Read register 2 | 5 | เลือก rt |
+| Read data 2 → Data in | 32 | ส่งข้อมูลเข้า Shifter |
+| IR<MathBlock tex={"6"} /> ถึง IR<MathBlock tex={"10"} /> → s0 ถึง s4 | 1 ต่อเส้น | ควบคุมระยะ Shift |
+| Data out → Write data | 32 | ส่งผลกลับ Register File |
+| IR<MathBlock tex={"15:11"} /> → Write register | 5 | เลือก rd |
+| RegWrite = 1 | 1 | อนุญาตให้เขียนผล |
+
+สำหรับ `srl` ไม่ต้องใช้ค่า Read data 1 เพราะ rs ไม่ใช่ Operand ต้นทาง
+
+**Mental Model\:** IR บอกว่าต้องอ่าน Register ไหน, เลื่อนเท่าไร และเขียน Register ไหน ส่วน Data จริงไหลจาก Register File ผ่าน Barrel Shifter แล้วกลับมาเก็บใน Register File
+
+---
+
+</section>
+
+<ChapterCompletion client:load chapter={4} basePath={basePath} />
+<div className="lesson-nav"><a href={`${basePath}/study/3/`}>← ข้อ 3</a><a href={`${basePath}/study/5/`}>ข้อ 5 →</a></div>

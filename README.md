@@ -1,60 +1,41 @@
 # ComArc Exam Lab
 
-A Thai-language, reading-first interactive textbook for **198322 Computer Architecture** (FE2019b, questions 1–6).
+A Thai-language, reading-first interactive textbook for **198322 Computer Architecture** (FE2019b, questions 1–6). The current `/study/` edition follows the approved shared textbook source; the previous edition remains available under `/legacy/study/`.
 
-## Features
-
-- Full worked lessons and solutions for questions 1–6, with interactive visual explanations
-- Signed/unsigned 4-bit adder and overflow explorer
-- ALU control explorer (ADD, SUB, AND, OR, NOR, SLT)
-- Multicycle 3-state Main Control explorer, separate zone A / zone B
-- 32-bit barrel shifter explorer and original annotated wiring diagram
-- Pipeline timeline / hazard explorer and instruction control tracing
-- Light and dark modes, adjustable reading font size, mobile navigation
-- Separate practice mode, local progress storage (no account/backend)
-- Works as a plain static website. No `npm install` or third-party JS libraries required
-
-## Run locally
+## Develop locally
 
 ```sh
-python3 -m http.server 8000
-# open http://localhost:8000/#/study/1
+npm ci
+npm run dev
 ```
 
-You can also open `index.html` locally in a browser, although using a local static server is recommended.
+Open `http://localhost:4321/comarc-exam-lab/`. The six lessons are authored as MDX, with interactive simulators and practice questions hydrated as small React islands. Progress, answers, theme, and reading size remain in this browser's `localStorage`.
 
-## Deploy to a NEW GitHub repository
-
-Create a **public** repository named `comarc-exam-lab` in the GitHub account `VVeb1250`. **Do not** add the files to the existing portfolio (`VVeb1250.github.io`).
+## Validate
 
 ```sh
-git init -b main
-git add .
-git commit -m "Build ComArc Exam Lab interactive textbook"
-git remote add origin https://github.com/VVeb1250/comarc-exam-lab.git
-git push -u origin main
+npm test
+npm run build
 ```
 
-Then in GitHub: Settings → Pages → Build and deployment → Source: **GitHub Actions**. `.github/workflows/pages.yml` deploys the static files in the repository's root. Expected URL: `https://vveb1250.github.io/comarc-exam-lab/`.
+`npm test` runs the Vitest calculator and content-integrity checks plus Playwright checks for all six current and legacy chapters, the interactive simulators, practice answers, theme, progress, and figure zoom. The static production files are written to `dist/`.
 
-### Content / copyright notes
+## GitHub Pages
 
-Explanations are newly authored for the user's exam preparation. SVG figures are redrawn from the hardware concepts. The original scanned exam PDF/images are **not included** in this public package. Review educational reuse/attribution rights before publishing original source pages.
+The Astro build uses the `/comarc-exam-lab/` base path and writes static files to `dist/`. `.github/workflows/pages.yml` runs tests and the production build for pull requests and deploys successful builds from `main`. In GitHub, set Pages to **GitHub Actions** under Settings → Pages → Build and deployment.
 
-### Important source discrepancies
+Expected URL: `https://vveb1250.github.io/comarc-exam-lab/`.
 
-FE2019b question 5 states **1 GHz** and **1 µs period** simultaneously; mathematically 1 GHz corresponds to **1 ns**. The website presents both timing assumptions explicitly.
+## Reference figures
 
-## Project files
+The approved source contains three raster figures, referenced at these exact paths:
 
-- `index.html`: accessible page shell + navigation
-- `style.css`: light/dark reading design and responsive styles
-- `app.js`: lesson content, visualizations, interactive practice, and client-side state
-- `.github/workflows/pages.yml`: GitHub Pages deployment
-- `favicon.svg`: site icon
+- `public/images/q3_datapath.png`
+- `public/images/fe2019b_q4_srl_wired.png`
+- `public/images/fe2019b_q6_figure5.png`
 
-## Notes
+The conversation showed these images inline, but the image bytes were not made available to the workspace. The lesson pages link the exact filenames and show a clear fallback until the original files are added. Do not replace them with approximations.
 
-- Hash-based navigation works under GitHub Pages project paths without rewrites.
-- Local progress stays on the user's browser only and will not sync across devices.
-- Theme defaults to OS setting; explicit user choice persists locally.
+The remaining small diagrams are the source SVGs embedded in the approved lesson text. Review educational reuse and attribution rights before publishing original source pages.
+
+FE2019b question 5 states **1 GHz** and **1 µs period** simultaneously; mathematically 1 GHz corresponds to **1 ns**. The site presents both timing assumptions explicitly.

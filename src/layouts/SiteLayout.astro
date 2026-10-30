@@ -1,0 +1,53 @@
+---
+import 'katex/dist/katex.min.css';
+import { AppControllers, ReadingProgress } from '../components/AppControllers.jsx';
+import { ChapterNavigation, CompletionCount, ProgressSummary, ReaderOutline } from '../components/ChapterNavigation.jsx';
+import ReaderControls from '../components/ReaderControls.jsx';
+
+const {
+  title = 'ComArc Exam Lab · Interactive Textbook',
+  currentLabel = 'Binary Arithmetic',
+  mode = 'study',
+  chapter = 1,
+  sections = [],
+} = Astro.props;
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<!doctype html>
+<html lang="th" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#f7f9fd" />
+    <meta name="description" content="ComArc Exam Lab: Interactive Computer Architecture textbook, worked examples, datapath diagrams and exam practice." />
+    <title>{title}</title>
+    <link rel="icon" href={`${basePath}/favicon.svg`} type="image/svg+xml" />
+    <link rel="stylesheet" href={`${basePath}/style.css`} />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar" aria-label="บทเรียน">
+        <a class="brand" href={`${basePath}/study/1/`} aria-label="ComArc Exam Lab home"><span class="brand-symbol">▤</span><span class="brand-text"><b>ComArc</b><small>EXAM LAB</small></span></a>
+        <div class="sidebar-group-label">EXAM COLLECTION</div>
+        <button class="collection" id="collection" type="button"><span class="collection-mark">FE</span><span><strong>FE2019b</strong><small>Computer Architecture · 6 ข้อ</small></span><span class="collection-chevron">⌄</span></button>
+        <div class="sidebar-group-label" style="margin-top:32px">CHAPTERS <CompletionCount client:load /></div>
+        <ChapterNavigation mode={mode} chapter={chapter} basePath={basePath} client:load />
+        <ProgressSummary client:load />
+      </aside>
+      <div class="main-pane">
+        <header class="topbar">
+          <div class="topbar-left"><button class="icon-button mobile-only" id="menu-open" type="button" aria-label="เปิดสารบัญ">☰</button><span class="top-path">EXAM LAB</span><span class="slash">/</span><span class="top-current" id="header-label">{currentLabel}</span></div>
+          <ReaderControls client:load />
+        </header>
+        <ReadingProgress client:load />
+        <div class="page-body">
+          <main id="page" class="reader" tabindex="-1"><slot /></main>
+          <aside class="right-rail" aria-label="สารบัญในบท"><div class="rail-sticky"><p class="rail-label">ON THIS PAGE</p><ReaderOutline sections={sections} client:load /><div class="rail-tip"><span class="tip-icon">⌘</span><p>เน้นเข้าใจ Data Flow ก่อนจำ Control Signals</p></div></div></aside>
+        </div>
+        <footer class="site-footer">ComArc Exam Lab <span>·</span> Study edition · FE2019b <span>·</span> เนื้อหาเรียบเรียงจากโจทย์ที่ผู้ใช้ให้มา</footer>
+      </div>
+    </div>
+    <AppControllers basePath={basePath} client:load />
+    <noscript><div class="no-js">เว็บไซต์นี้ต้องเปิด JavaScript เพื่อแสดงบทเรียนและตัวจำลอง</div></noscript>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+
+const files = import.meta.glob('../../content/chapters/*.mdx', { eager: true });
+
+export function getStaticPaths() {
+  return Array.from({ length: 6 }, (_, index) => ({ params: { chapter: String(index + 1) } }));
+}
+
+const chapterId = Number(Astro.params.chapter);
+const filename = `../../content/chapters/${String(chapterId).padStart(2, '0')}.mdx`;
+const chapterModule = files[filename];
+const ChapterContent = chapterModule.default;
+const { chapterInfo } = chapterModule;
+---
+<SiteLayout
+  title={`${chapterInfo.title} · ComArc Exam Lab`}
+  currentLabel={chapterInfo.title}
+  mode="study"
+  chapter={chapterId}
+  sections={chapterInfo.sections}
+>
+  <ChapterContent />
+</SiteLayout>
