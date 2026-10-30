@@ -31,11 +31,18 @@ test('all six approved study chapters render their headings and source figures',
     await expect(page.locator('#page .hero-title')).toHaveText(chapter.title);
     await expect(page.locator('#page .lesson-section')).not.toHaveCount(0);
   }
-  for (const [chapter, imageAlt] of [[3, 'รูปที่ 2 Multicycle Machine'], [4, 'เฉลยข้อ 4 SRL Datapath พร้อมสายสี'], [6, 'Pipeline Machine จากรูปที่ 5 ของข้อสอบ']]) {
+  for (const [chapter, imageAlt, imageName] of [
+    [3, 'รูปที่ 2 Multicycle Machine', 'q3_datapath.png'],
+    [4, 'เฉลยข้อ 4 SRL Datapath พร้อมสายสี', 'fe2019b_q4_srl_wired.png'],
+    [6, 'Pipeline Machine จากรูปที่ 5 ของข้อสอบ', 'fe2019b_q6_figure5.png'],
+  ]) {
     await open(page, `study/${chapter}/`);
     const figure = page.locator('.source-figure').filter({ has: page.locator(`img[alt="${imageAlt}"]`) });
     await expect(figure).toHaveCount(1);
-    await expect.poll(async () => figure.locator('.source-figure-missing').isVisible() || figure.evaluate((element) => element.classList.contains('loaded'))).toBe(true);
+    await expect(figure).toHaveClass(/loaded/);
+    const image = figure.locator('img');
+    await expect(image).toHaveAttribute('src', new RegExp(`/comarc-exam-lab/images/${imageName}$`));
+    await expect.poll(() => image.evaluate((element) => element.complete && element.naturalWidth > 0)).toBe(true);
   }
 });
 

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
@@ -56,6 +56,7 @@ describe('preserved lesson editions', () => {
       const mdx = readFileSync(chapterPath(Number(chapter)), 'utf8');
       expect(mdx).toContain(`/images/${name}`);
       expect(mdx).toContain('SourceFigure client:load');
+      expect(statSync(fileURLToPath(new URL(`../../public/images/${name}`, import.meta.url))).size).toBeGreaterThan(1_000);
     }
   });
 
