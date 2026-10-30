@@ -1,0 +1,383 @@
+import { PipelineTimeline, HazardExplorer } from '../../components/SimulatorIslands.jsx';
+import ChapterCompletion from '../../components/ChapterCompletion.jsx';
+import SvgBlock from '../../components/SvgBlock.jsx';
+import SourceFigure from '../../components/SourceFigure.jsx';
+import MathBlock from '../../components/MathBlock.jsx';
+
+export const chapterInfo = {
+  "id": 5,
+  "title": "ข้อ 5: Pipeline และ Hazards",
+  "subtitle": "10 คะแนน · ข้อ 5.1–5.10 · รูปที่ 4",
+  "short": "Pipeline และ Hazards",
+  "icon": "05",
+  "sections": [
+    {
+      "id": "ch5-section-1",
+      "title": "5.1 Pipeline ต่างจาก Multicycle อย่างไร?"
+    },
+    {
+      "id": "ch5-section-2",
+      "title": "5.2 ทดลอง Pipeline ทีละ Clock"
+    },
+    {
+      "id": "ch5-section-3",
+      "title": "5.3 ข้อ 5.1 คำนวณเวลา Pipeline"
+    },
+    {
+      "id": "ch5-section-4",
+      "title": "5.4 ทำความเข้าใจ Hazard ทั้งสามชนิด"
+    },
+    {
+      "id": "ch5-section-5",
+      "title": "5.5 ข้อ 5.4–5.7: ทำไม Forwarding บางครั้งช่วยได้ บางครั้งไม่ได้?"
+    },
+    {
+      "id": "ch5-section-6",
+      "title": "5.6 ข้อ 5.8: Instruction Scheduling"
+    },
+    {
+      "id": "ch5-section-7",
+      "title": "5.7 ข้อ 5.9–5.10"
+    },
+    {
+      "id": "ch5-section-8",
+      "title": "5.8 เฉลยข้อ 5 ครบ"
+    }
+  ]
+};
+export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+<h1 className="hero-title">ข้อ 5: Pipeline และ Hazards</h1>
+
+10 คะแนน · ข้อ 5.1–5.10 · รูปที่ 4
+
+<section className="lesson-section" id="ch5-section-1">
+
+## 5.1 Pipeline ต่างจาก Multicycle อย่างไร?
+
+Multicycle Machine ในข้อ 3 ทำ Instruction หนึ่งตัวให้เสร็จก่อน แล้วจึงเริ่มตัวต่อไป
+
+แต่ Pipeline พยายามให้หลาย Instruction ทำงานพร้อมกัน โดยแต่ละตัวอยู่คนละขั้นตอน
+
+เครื่องในข้อสอบมี 5 Stages
+
+สมมติ CPU กำลังทำ Instruction 3 ตัว
+
+Clock 3 อาจมี I1 อยู่ EX, I2 อยู่ ID และ I3 อยู่ IF
+
+ดังนั้น **คำสั่งหนึ่งไม่ได้จบเร็วขึ้นโดยอัตโนมัติ แต่จำนวนคำสั่งที่ทำเสร็จต่อเวลาเพิ่มขึ้น**
+
+นี่คือความแตกต่างระหว่าง
+
+- **Latency\:** หนึ่ง Instruction ใช้เวลาตั้งแต่เริ่มจนจบเท่าไร
+- **Throughput\:** ทำ Instruction เสร็จได้กี่ตัวต่อหน่วยเวลา
+
+</section>
+
+<section className="lesson-section" id="ch5-section-2">
+
+## 5.2 ทดลอง Pipeline ทีละ Clock
+
+<PipelineTimeline client:load />
+
+จุดที่ไฮไลต์แสดง Stage ที่ Instruction กำลังทำงานใน Clock ที่เลือก สมมติว่าไม่มี Stall หรือ Flush
+
+[ก่อนหน้า] [ถัดไป]
+
+ลองเลือก Clock 4 จะเห็นว่า I1 อยู่ MEM, I2 อยู่ EX, I3 อยู่ ID และ I4 อยู่ IF
+
+นี่คือข้อดีและปัญหาของ Pipeline พร้อมกัน เพราะหลาย Instruction อาจต้องการทรัพยากรหรือข้อมูลที่เกี่ยวข้องกันในเวลาเดียวกัน
+
+</section>
+
+<section className="lesson-section" id="ch5-section-3">
+
+## 5.3 ข้อ 5.1 คำนวณเวลา Pipeline
+
+ถ้ามี N Instructions และ Pipeline 5 Stages ที่ทำงานสมบูรณ์ ไม่มี Stall
+
+<MathBlock tex={"\\boxed{Cycles=N+(5-1)=N+4}"} />
+
+ทำไมต้องบวก 4?
+
+เพราะ Instruction แรกต้องใช้ 5 Clock กว่าจะเสร็จ หลังจากนั้นเมื่อ Pipeline เต็มแล้ว จะมี Instruction เสร็จได้หนึ่งตัวต่อ Clock ภายใต้สมมติฐานนี้
+
+ตัวอย่าง 10 Instructions
+
+- I1 เสร็จ Clock 5
+- I2 เสร็จ Clock 6
+- I3 เสร็จ Clock 7
+- \...
+- I10 เสร็จ Clock 14
+
+โจทย์กำหนด Clock Rate = 1 GHz แต่ใส่วงเล็บว่า Clock Period = 1 µs ซึ่งขัดกัน
+
+ตามการคำนวณความถี่
+
+<MathBlock tex={"1\\ GHz\\implies T=1\\ ns"} />
+
+ดังนั้นผลจะเป็นดังนี้
+
+| Instructions | Cycles | เวลาใช้ 1 GHz | เวลาใช้ 1 µs |
+|--------|--------|--------|--------|
+| 1 | 5 | 5 ns | 5 µs |
+| 10 | 14 | 14 ns | 14 µs |
+| 1,000,000 | 1,000,004 | 1.000004 ms | 1.000004 s |
+
+คอลัมน์ 1 GHz เป็นค่าที่ถูกตามความสัมพันธ์ระหว่าง Frequency กับ Period ส่วนอีกคอลัมน์แสดงผลตาม Period ที่โจทย์ระบุไว้โดยตรง
+
+</section>
+
+<section className="lesson-section" id="ch5-section-4">
+
+## 5.4 ทำความเข้าใจ Hazard ทั้งสามชนิด
+
+Hazard คือสถานการณ์ที่การทำงานซ้อนกันของ Pipeline อาจทำให้ดำเนินการต่อไม่ได้ตามปกติหรือเสี่ยงได้ผลลัพธ์ผิด
+
+**Structural Hazard**
+
+แย่งอุปกรณ์ เช่น IF กับ MEM ต้องใช้ Memory เดียวกันพร้อมกัน แต่ Memory รองรับไม่พอ
+
+---
+
+**Data Hazard**
+
+ต้องใช้ค่าจาก Instruction ก่อนหน้า แต่ข้อมูลล่าสุดยังไม่พร้อม เช่น RAW
+
+---
+
+**Control Hazard**
+
+ยังไม่รู้ว่าควร Fetch Instruction จาก Address ไหน เช่น Branch ยังตัดสินไม่เสร็จ
+
+### ข้อ 5.2: Structural Hazard
+
+ที่ Clock 4 คำสั่ง I1 อยู่ MEM และ I4 อยู่ IF
+
+ทั้งคู่ต้องการอ่าน Memory แต่ถ้า Instruction กับ Data ใช้ Memory อุปกรณ์เดียวกันที่รองรับ Access ได้ทีละรายการ จะเกิดการแย่งกัน
+
+**เฉลย: Structural Hazard**
+
+วิธีแก้เช่นแยก Instruction Memory กับ Data Memory หรือเพิ่มความสามารถของ Memory ให้รองรับการเข้าถึงพร้อมกัน
+
+### ข้อ 5.3: Control Hazard
+
+โจทย์ยกตัวอย่าง
+
+```mips
+beq $s0, $s1, 0x1200
+```
+
+ต้องเปรียบเทียบ `$s0` กับ `$s1` ก่อนจึงรู้ว่าจะ Branch หรือไปต่อที่ PC+4
+
+แต่ I2 ถูก Fetch มาแล้วใน Clock 2 ขณะที่การเปรียบเทียบของ I1 เพิ่งทำใน EX Stage ที่ Clock 3
+
+ถ้า Branch Taken คำสั่งที่ Fetch มาตามทางเดิมอาจผิด
+
+**I1: beq**
+
+EX: เปรียบเทียบ Register
+
+**Taken**
+
+ไป Branch Target
+
+**Not Taken**
+
+ไป PC+4
+
+ก่อนรู้ผลจริง CPU อาจ Fetch จากเส้นทางที่ผิดไว้แล้ว
+
+**เฉลย: Control Hazard**
+
+Branch Prediction เป็นวิธีช่วยลดผลกระทบของ Hazard แบบนี้ โดยคาดการณ์ทิศทางล่วงหน้า และต้อง Flush คำสั่งที่ผิดเส้นทางหากทำนายผิด
+
+หมายเหตุ: โจทย์ยก Branch Target เป็น PC+4+0x1200 ส่วนการตีความ Immediate ของ MIPS Branch ตามปกติใช้ Sign-extended Offset ที่ Shift Left 2 ประเด็นที่ข้อ 5.3 ทดสอบคือการรอผล Branch
+
+<HazardExplorer client:load />
+
+</section>
+
+<section className="lesson-section" id="ch5-section-5">
+
+## 5.5 ข้อ 5.4–5.7: ทำไม Forwarding บางครั้งช่วยได้ บางครั้งไม่ได้?
+
+กลุ่มนี้ควรเรียนต่อเนื่องกัน เพราะกำลังอธิบาย Hazard ที่คล้ายกันสองกรณี
+
+### กรณี A: ALU Result พร้อม แต่ยังไม่เขียน Register
+
+โจทย์ใช้
+
+```mips
+I1: addi $s0, $zero, 0x1200
+I2: ori  $s1, $s0, 0x0A00
+```
+
+I2 ต้องการค่าล่าสุดของ `$s0` จาก I1
+
+แต่ I1 จะ Write Back ใน Clock 5 ขณะที่ I2 ต้องใช้ `$s0` ใน EX ของ Clock 4
+
+นี่คือ **RAW Data Hazard** เพราะ I2 ต้องอ่านค่าที่ I1 กำลังเขียน
+
+อย่างไรก็ตาม I1 คำนวณผลจาก ALU เสร็จตั้งแต่ Clock 3 แล้ว
+
+ดังนั้น Clock 4 สามารถส่งผล ALU จาก Pipeline Register ของ I1 ไปยัง Input ALU ของ I2 ได้โดยตรง
+
+**Clock 3: I1 อยู่ EX**
+
+คำนวณค่าใหม่ของ \$s0 เสร็จ
+
+Forwarding
+
+**Clock 4: I2 อยู่ EX**
+
+รับค่าล่าสุดไปใช้ ไม่รอ WB
+
+คำตอบข้อ 5.5 คือ **Forwarding หรือ Bypassing**
+
+### กรณี B: Load-Use Hazard
+
+โจทย์เปลี่ยนเป็น
+
+```mips
+I1: lw   $s0, 0($s5)
+I2: addi $s1, $s0, 1
+```
+
+I2 ยังต้องการ `$s0` เช่นเดิม แต่ตอนนี้ I1 เป็น `lw`
+
+ค่าที่ต้องการไม่ได้ออกจาก ALU ทันที เพราะ ALU เพียงคำนวณ Address ส่วนข้อมูลจริงต้องอ่านจาก Memory ใน MEM Stage
+
+เปรียบเทียบเวลาที่ข้อมูลพร้อม
+
+**ALU → ALU**
+
+I1 คำนวณ EX ที่ Clock 3
+
+---
+
+I2 ใช้ค่าใน EX ที่ Clock 4
+
+Forward ได้ทัน
+
+**Load → ALU**
+
+I1 ได้ Data หลัง MEM Clock 4
+
+---
+
+I2 ต้องการค่าใน EX Clock 4
+
+Forward ไม่ทัน
+
+นี่คือ **Load-Use Hazard** ซึ่งเป็น Data Hazard แบบ RAW ชนิดหนึ่ง
+
+แม้เพิ่มเส้นทาง Forwarding ข้อมูลก็ยังมาไม่ทันใน Clock 4 จึงต้องเลื่อน I2 ออกไปก่อน
+
+### ข้อ 5.7: Pipeline Stall
+
+Stall คือการหยุดคำสั่งที่ต้องรอไว้ชั่วคราว เพื่อให้ข้อมูลพร้อมก่อนใช้งาน
+
+ตัวอย่าง Timeline ของ Load-Use
+
+| Clock | I1: lw | I2: addi |
+|--------|--------|--------|
+| 1 | IF |  |
+| 2 | ID | IF |
+| 3 | EX | ID |
+| 4 | MEM | Stall ที่ ID |
+| 5 | WB | EX |
+| 6 |  | MEM |
+| 7 |  | WB |
+
+ใน Clock 4 คำสั่ง I2 ถูกพักไว้ และ Pipeline แทรก Bubble ใน EX แทน จากนั้นจึงไป EX ใน Clock 5 เมื่อสามารถรับข้อมูลจาก I1 ได้ทัน
+
+**เฉลย: Pipeline Stall**
+
+ข้อเสียคือเสียเวลาเพิ่มหนึ่ง Clock และ Throughput ลดลง
+
+</section>
+
+<section className="lesson-section" id="ch5-section-6">
+
+## 5.6 ข้อ 5.8: Instruction Scheduling
+
+Compiler อาจช่วยลด Stall ได้โดยนำคำสั่งที่ไม่ขึ้นต่อกันมาแทรก
+
+ก่อนจัดเรียง
+
+```mips
+lw   $t0, 0($s0)
+addi $t1, $t0, 1
+add  $t2, $t3, $t4
+```
+
+คำสั่ง `addi` ต้องรอผล `lw` แต่ `add $t2,$t3,$t4` ไม่ขึ้นกับผลของ `lw`
+
+จึงจัดใหม่เป็น
+
+```mips
+lw   $t0, 0($s0)
+add  $t2, $t3, $t4
+addi $t1, $t0, 1
+```
+
+**ก่อน**
+
+lw
+
+addi: รอ lw
+
+add
+
+**หลัง**
+
+lw
+
+add: งานอิสระ
+
+addi: ใช้ผล lw
+
+ต้องจัดเรียงโดยไม่เปลี่ยนความหมายและผลลัพธ์ของโปรแกรม
+
+**เฉลย: Instruction Scheduling**
+
+</section>
+
+<section className="lesson-section" id="ch5-section-7">
+
+## 5.7 ข้อ 5.9–5.10
+
+**Branch Prediction** ช่วยลดผลกระทบของ Control Hazard โดยคาดการณ์ว่า Branch จะ Taken หรือ Not Taken เพื่อให้ CPU Fetch คำสั่งต่อไปโดยไม่ต้องหยุดรอทุกครั้ง
+
+**Memory Hierarchy** เช่น Cache ช่วยลดเวลารอเข้าถึงหน่วยความจำเมื่อเกิด Cache Hit จึงช่วยลด Memory Stalls ได้ และการแยก Instruction Cache กับ Data Cache ยังช่วยบรรเทา Structural Hazard จากการใช้ Memory ร่วมกันได้ด้วย
+
+ไม่ได้หมายความว่า Cache แก้ Hazard ได้ทุกชนิด เพราะ Cache Miss ยังทำให้ต้องรอ Memory ได้
+
+</section>
+
+<section className="lesson-section" id="ch5-section-8">
+
+## 5.8 เฉลยข้อ 5 ครบ
+
+| ข้อ | คำตอบ | เหตุผล |
+|--------|--------|--------|
+| 5.1 | N+4 Cycles | 5 Stages, ไม่มี Stall |
+| 5.2 | Structural Hazard | แย่ง Memory |
+| 5.3 | Control Hazard | ยังไม่รู้ผล Branch |
+| 5.4 | Data Hazard (RAW) | ต้องใช้ค่าใหม่ก่อน WB |
+| 5.5 | Forwarding / Bypassing | ส่งค่าลัดไป EX |
+| 5.6 | Load-Use Hazard | Data จาก lw ยังไม่พร้อม |
+| 5.7 | Pipeline Stall | พัก Instruction เพื่อรอ |
+| 5.8 | Instruction Scheduling | จัดลำดับคำสั่งลด Stall |
+| 5.9 | Control Hazard | Branch Prediction ช่วย |
+| 5.10 | Memory Stalls และ Structural Hazard บางกรณี | Cache / Memory Hierarchy |
+
+**Mental Model\:** Pipeline ทำหลาย Instruction พร้อมกัน จึงต้องตรวจว่าแย่งอุปกรณ์หรือไม่ รอข้อมูลหรือไม่ และรู้เส้นทาง Instruction ถัดไปแล้วหรือยัง
+
+---
+
+</section>
+
+<ChapterCompletion client:load chapter={5} basePath={basePath} />
+<div className="lesson-nav"><a href={`${basePath}/study/4/`}>← ข้อ 4</a><a href={`${basePath}/study/6/`}>ข้อ 6 →</a></div>

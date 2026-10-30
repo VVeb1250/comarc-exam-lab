@@ -1,0 +1,42 @@
+import { PipelineControlExplorer } from '../../components/SimulatorIslands.jsx';
+
+export const chapterInfo = {
+  "id": 6,
+  "title": "Pipeline Registers",
+  "subtitle": "Control ของ Instruction เดินทางอย่างไร",
+  "short": "Pipeline Control",
+  "icon": "06",
+  "lede": "เมื่อหลาย Instruction ทำงานพร้อมกัน Main Control ที่อยู่ ID เพียงตัวเดียวจะส่ง Control ให้ EX, MEM และ WB อย่างถูกต้องได้อย่างไร?",
+  "sections": [
+    {
+      "id": "control-problem",
+      "title": "1. ปัญหาของ Main Control ที่มีเพียงตัวเดียว"
+    },
+    {
+      "id": "pipeline-registers",
+      "title": "2. Pipeline Registers เก็บอะไร?"
+    },
+    {
+      "id": "control-groups",
+      "title": "3. แบ่ง EX / M / WB Controls ทำไม?"
+    },
+    {
+      "id": "instruction-walk",
+      "title": "4. เดินตาม lw ทีละ Clock"
+    },
+    {
+      "id": "hazard-forward",
+      "title": "5. Hazard Detection กับ Forwarding เกี่ยวอย่างไร?"
+    },
+    {
+      "id": "pipeline-essay",
+      "title": "6. คำตอบข้อสอบข้อ 6"
+    }
+  ]
+};
+export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+import ChapterCompletion from '../../components/ChapterCompletion.jsx';
+
+
+<div class="eyebrow">CHAPTER 06 / 06 · FE2019B · 10 POINTS</div><h1 class="hero-title">Pipeline Registers</h1><p class="hero-lede">เมื่อหลาย Instruction ทำงานพร้อมกัน Main Control ที่อยู่ ID เพียงตัวเดียวจะส่ง Control ให้ EX, MEM และ WB อย่างถูกต้องได้อย่างไร?</p><div class="hero-meta"><span>CONCEPT FIRST</span><span>WORKED EXAMPLE</span><span>EXAM SOLUTION</span></div><section class="lesson-section" id="control-problem"><h2>1. ปัญหาของ Main Control ที่มีเพียงตัวเดียว</h2><p>สมมติ Instruction สามตัว: <code>I1: lw $t0,0($s1)</code>, <code>I2: add $t2,$t3,$t4</code>, <code>I3: sw $t5,4($s1)</code> ซึ่งไม่ต้องรอข้อมูลจากกัน</p><div class="diagram-card"><div class="diagram-title"><strong>Clock 4 · three instructions</strong><button type="button" class="figure-zoom" data-action="zoom" aria-label="ขยายภาพ Clock 4 · three instructions">ขยาย ↗</button></div><div class="three-tiles"><div><strong>I1 · lw</strong><small>MEM</small><b>MemRead=1</b></div><div><strong>I2 · add</strong><small>EX</small><b>ALUOp=10</b></div><div><strong>I3 · sw</strong><small>ID</small><b>Decode sw</b></div></div></div><p>ตอนนี้ Main Control กำลัง Decode <code>sw</code> แต่คำสั่ง <code>lw</code> ใน MEM ต้องใช้ <code>MemRead=1</code> ถ้าใช้ Control ใหม่ของ sw ส่งตรงไป MEM จะควบคุมผิด Instruction</p><div class="learning-note info"><strong>คำตอบแกนกลาง</strong><div>Main Control สร้าง Control ของแต่ละ Instruction ใน ID แล้วเก็บส่งต่อผ่าน Pipeline Registers ไปพร้อม Data ของ Instruction นั้น</div></div></section><section class="lesson-section" id="pipeline-registers"><h2>2. Pipeline Registers เก็บอะไร?</h2><p>Pipeline Register ต่างจาก Register File ที่โปรแกรมใช้เก็บตัวเลข เช่น $t0 เพราะ Pipeline Register ใช้พักข้อมูลระหว่าง Stage รวมถึง Operand, Destination Register และ Control Signals ของคำสั่งนั้น</p><div class="table-scroll"><table class="data-table "><thead><tr><th>Register File</th><th>Pipeline Register</th></tr></thead><tbody><tr><td><strong>เก็บค่าของโปรแกรม</strong></td><td>เก็บ Data และ Control ระหว่าง Stage</td></tr><tr><td><strong>อ่าน/เขียนผ่านหมายเลข Register</strong></td><td>เปลี่ยนค่าตาม Clock และการไหลของ Instruction</td></tr><tr><td><strong>ค่าคงอยู่จนกว่าจะถูกเขียนทับ</strong></td><td>ค่าของ Instruction ก่อนหน้าถูกส่งต่อไป Stage ถัดไป</td></tr></tbody></table></div></section><section class="lesson-section" id="control-groups"><h2>3. แบ่ง EX / M / WB Controls ทำไม?</h2><p>Main Control สร้าง Signals ที่ ID แล้วแบ่งเป็นกลุ่มตาม Stage ที่ต้องใช้ เพราะบาง Control ต้องรอจนถึง EX, MEM หรือ WB จึงได้ใช้งาน</p><div class="table-scroll"><table class="data-table "><thead><tr><th>กลุ่ม</th><th>ใช้ที่</th><th>ตัวอย่าง</th></tr></thead><tbody><tr><td><strong>EX</strong></td><td>EX</td><td>ALUSrc, ALUOp, RegDst</td></tr><tr><td><strong>M</strong></td><td>MEM</td><td>MemRead, MemWrite, Branch</td></tr><tr><td><strong>WB</strong></td><td>WB</td><td>RegWrite, MemToReg</td></tr></tbody></table></div><div class="diagram-card"><div class="diagram-title"><strong>Control travels with instruction</strong><button type="button" class="figure-zoom" data-action="zoom" aria-label="ขยายภาพ Control travels with instruction">ขยาย ↗</button></div><div class="control-path"><div class="control-node"><strong>ID · Main Control</strong><small>สร้าง EX + M + WB</small></div><div class="control-arrow">↓</div><div class="control-node"><strong>ID/EX Register</strong><small>พัก Control ของ Instruction</small><div class="control-bits"><span class="ex">EX</span><span class="m">M</span><span class="wb">WB</span></div></div><div class="control-arrow">↓</div><div class="control-node"><strong>EX Stage</strong><small>ใช้ EX Controls</small></div><div class="control-arrow">↓</div><div class="control-node"><strong>EX/MEM Register</strong><small>ส่ง Control ที่เหลือ</small><div class="control-bits"><span class="m">M</span><span class="wb">WB</span></div></div><div class="control-arrow">↓</div><div class="control-node"><strong>MEM Stage</strong><small>ใช้ M Controls</small></div><div class="control-arrow">↓</div><div class="control-node"><strong>MEM/WB Register</strong><small>ส่ง Control สุดท้าย</small><div class="control-bits"><span class="wb">WB</span></div></div><div class="control-arrow">↓</div><div class="control-node"><strong>WB Stage</strong><small>ใช้ WB Controls</small></div></div><div class="fig-caption">ใช้ Control ใน Stage นั้นแล้วส่งเฉพาะกลุ่มที่เหลือไปต่อ</div></div><p>ID/EX เก็บ EX,M,WB; เมื่อ EX ใช้ EX ไปแล้ว EX/MEM จะส่ง M,WB ต่อ; และเมื่อ MEM ใช้ M ไปแล้ว MEM/WB จะส่งเฉพาะ WB</p></section><section class="lesson-section" id="instruction-walk"><h2>4. เดินตาม lw ทีละ Clock</h2><div class="table-scroll"><table class="data-table "><thead><tr><th>Clock</th><th>lw อยู่ Stage</th><th>Control และการทำงาน</th></tr></thead><tbody><tr><td><strong>1</strong></td><td>IF</td><td>Fetch Instruction</td></tr><tr><td><strong>2</strong></td><td>ID</td><td>Main Control สร้าง EX/M/WB Controls</td></tr><tr><td><strong>3</strong></td><td>EX</td><td>ใช้ ALUSrc=1, ALUOp=00 คำนวณ Address</td></tr><tr><td><strong>4</strong></td><td>MEM</td><td>ใช้ MemRead=1 อ่าน Memory</td></tr><tr><td><strong>5</strong></td><td>WB</td><td>ใช้ RegWrite=1, MemToReg=1 เขียนค่าลง Register</td></tr></tbody></table></div><p>ใน Clock 4 แม้ Main Control จะกำลัง Decode sw อยู่ที่ ID แต่ lw ที่ MEM ใช้ M Controls ของตัวเองจาก EX/MEM Register ไม่เกี่ยวกับ Control ใหม่ของ sw</p><p>ทุกครั้งที่เกิด Clock edge ข้อมูลและ Control จะถูก Latch เข้าสู่ Stage Register ถัดไป โดยต้องรักษาความสอดคล้องกันระหว่าง Data และ Control</p><PipelineControlExplorer client:load /></section><section class="lesson-section" id="hazard-forward"><h2>5. Hazard Detection กับ Forwarding เกี่ยวอย่างไร?</h2><p>Hazard Detection Unit ตรวจปัญหา เช่น Load-Use และควบคุม Stall หรือ Flush เมื่อต้องรอหรือยกเลิก Instruction ซึ่งต้องทำให้ Data และ Control ที่ถูกพัก/ล้างสอดคล้องกันด้วย</p><p>Forwarding Unit เลือกเส้นทางข้อมูลลัดจาก Stage ข้างหน้าไปยัง Operand ของ Instruction ที่ต้องใช้ มันไม่ได้สร้าง Main Control ใหม่ให้ Instruction ทุกตัว</p><div class="learning-note info"><strong>ตัวอย่างความผิดพลาดถ้า Flush ไม่ถูก</strong><div>ถ้าคำสั่งที่ถูกยกเลิกยังมี RegWrite=1 หรือ MemWrite=1 อาจไปเขียนผลผิดได้ จึงต้องทำให้ Control ของ Bubble ไม่มี Side Effect</div></div></section><section class="lesson-section" id="pipeline-essay"><h2>6. คำตอบข้อสอบข้อ 6</h2><div class="answer-box"><strong>คำตอบพร้อมเขียนสอบ</strong><p>Main Control สร้าง Control Signals ของแต่ละ Instruction ใน ID Stage แล้วเก็บส่งต่อผ่าน Pipeline Registers พร้อมข้อมูลของ Instruction นั้น โดย ID/EX เก็บ EX, M และ WB Controls เมื่อ Instruction เข้าสู่ EX จะใช้ EX Controls และส่ง M กับ WB ผ่าน EX/MEM ต่อไป จากนั้น MEM ใช้ M Controls แล้วส่ง WB ผ่าน MEM/WB จนถึง WB Stage ทำให้แต่ละ Stage ได้ Control ที่ตรงกับ Instruction ของตนเอง แม้มีหลาย Instruction ทำงานพร้อมกัน</p></div><div class="memory-model"><strong>MENTAL MODEL</strong><p>Control ไม่ได้ถูกสร้างซ้ำทุก Stage แต่สร้างใน ID แล้วเดินทางไปกับ Instruction ผ่าน Pipeline Registers และใช้ใน Stage ที่ต้องการ</p></div><div class="source-note">คำอธิบายอ้างอิงโจทย์ FE2019b และ Diagram ของเครื่องตามที่โจทย์กำหนด ตัวอย่างใหม่ใช้เพื่อช่วยเรียน ไม่ใช่ข้อความจากข้อสอบโดยตรง</div></section><ChapterCompletion client:load chapter={6} basePath={basePath} /><div class="lesson-nav"><a href={`${basePath}/legacy/study/5/`}>← ข้อ 5</a><a href={`${basePath}/legacy/study/1/`}>ข้อ 1 →</a></div>

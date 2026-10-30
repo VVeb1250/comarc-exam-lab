@@ -1,0 +1,733 @@
+{
+  "chapters": [
+    {
+      "id": 1,
+      "title": "ข้อ 1: Binary Arithmetic & Overflow",
+      "subtitle": "10 คะแนน · ข้อ 1.1–1.8",
+      "short": "Binary Arithmetic & Overflow",
+      "icon": "01"
+    },
+    {
+      "id": 2,
+      "title": "ข้อ 2: ALU Control",
+      "subtitle": "10 คะแนน · ข้อ 2.1–2.8 · รูปที่ 1",
+      "short": "ALU Control",
+      "icon": "02"
+    },
+    {
+      "id": 3,
+      "title": "ข้อ 3: Multicycle Datapath",
+      "subtitle": "10 คะแนน · รูปที่ 2 · ตารางที่ 3 และ 4",
+      "short": "Multicycle Datapath",
+      "icon": "03"
+    },
+    {
+      "id": 4,
+      "title": "ข้อ 4: Barrel Shifter และ SRL Datapath",
+      "subtitle": "10 คะแนน · รูปที่ 3 · วาดสายเชื่อมต่อ",
+      "short": "Barrel Shifter และ SRL Datapath",
+      "icon": "04"
+    },
+    {
+      "id": 5,
+      "title": "ข้อ 5: Pipeline และ Hazards",
+      "subtitle": "10 คะแนน · ข้อ 5.1–5.10 · รูปที่ 4",
+      "short": "Pipeline และ Hazards",
+      "icon": "05"
+    },
+    {
+      "id": 6,
+      "title": "ข้อ 6: Pipeline Registers และ Control Signals",
+      "subtitle": "10 คะแนน · รูปที่ 5 · อธิบายกลไกการส่งต่อ Control",
+      "short": "Pipeline Registers และ Control Signals",
+      "icon": "06"
+    }
+  ],
+  "quizzes": {
+    "1": [
+      {
+        "q": "Signed 4-bit: 0101 + 0110 ได้ Result และ Overflow อะไร?",
+        "choices": [
+          "1011, True",
+          "1011, False",
+          "0111, True"
+        ],
+        "correct": 0,
+        "why": "5+6=11 เกินช่วง Signed 4-bit (−8 ถึง 7) จึง Overflow แม้ Result 4-bit เป็น 1011"
+      },
+      {
+        "q": "Signed 4-bit: 1001 + 0011 ได้เท่าไร?",
+        "choices": [
+          "1100, False",
+          "1100, True",
+          "1010, False"
+        ],
+        "correct": 0,
+        "why": "−7+3=−4 ซึ่งเก็บได้ใน Signed 4-bit ในรูป 1100"
+      }
+    ],
+    "2": [
+      {
+        "q": "SUB ต้องตั้ง Binv / CarryIn อย่างไร?",
+        "choices": [
+          "0/0",
+          "1/0",
+          "1/1"
+        ],
+        "correct": 2,
+        "why": "A−B = A+NOT(B)+1 ต้องกลับบิต B และบวก 1"
+      },
+      {
+        "q": "NOR ใช้ Ainv, Binv, Operation ชุดไหน?",
+        "choices": [
+          "0,0,01",
+          "1,1,00",
+          "1,0,10"
+        ],
+        "correct": 1,
+        "why": "กฎ De Morgan: NOT(A OR B) = NOT(A) AND NOT(B)"
+      }
+    ],
+    "3": [
+      {
+        "q": "lw State 1: ALUSrcA และ ALUSrcB เป็นค่าอะไร?",
+        "choices": [
+          "0,01",
+          "1,10",
+          "1,00"
+        ],
+        "correct": 1,
+        "why": "คำนวณ Register[rs] + SignExt(Immediate)"
+      },
+      {
+        "q": "beq State 2 เปิด Control ใดเพื่อเปลี่ยน PC แบบมีเงื่อนไข?",
+        "choices": [
+          "PCWrite",
+          "PCWriteCond",
+          "RegWrite"
+        ],
+        "correct": 1,
+        "why": "เปรียบเทียบ Register ด้วย ALU ลบ แล้วใช้ PCWriteCond ร่วมกับ Zero"
+      }
+    ],
+    "4": [
+      {
+        "q": "srl $t0,$t1,3 อ่านข้อมูลจาก Field ใด?",
+        "choices": [
+          "rs",
+          "rt",
+          "rd"
+        ],
+        "correct": 1,
+        "why": "คำสั่ง SRL ใช้ rt เป็นต้นทาง และ rd เป็นปลายทาง"
+      },
+      {
+        "q": "Shift right 13 เปิด MUX ใด?",
+        "choices": [
+          "s0, s2, s3",
+          "s1, s2, s4",
+          "s3, s4"
+        ],
+        "correct": 0,
+        "why": "13=8+4+1 จึงเปิด s3,s2,s0"
+      }
+    ],
+    "5": [
+      {
+        "q": "lw ตามด้วย addi ที่ต้องใช้ผล lw ทันทีคือ Hazard ใด?",
+        "choices": [
+          "Structural",
+          "Load-Use",
+          "Control"
+        ],
+        "correct": 1,
+        "why": "ข้อมูล Memory เพิ่งพร้อมหลัง MEM Clock 4 แต่ addi ต้องการใน EX Clock 4"
+      },
+      {
+        "q": "Branch Prediction ใช้บรรเทา Hazard ประเภทใด?",
+        "choices": [
+          "Control",
+          "RAW",
+          "Structural"
+        ],
+        "correct": 0,
+        "why": "ทำนาย Taken/Not Taken เพื่อหลีกเลี่ยงรอผล Branch ทุกครั้ง"
+      }
+    ],
+    "6": [
+      {
+        "q": "Control กลุ่ม M ไปถึง MEM ผ่าน Register ใด?",
+        "choices": [
+          "IF/ID",
+          "EX/MEM",
+          "Register File"
+        ],
+        "correct": 1,
+        "why": "Main Control สร้างที่ ID แล้ว M Controls ผ่าน ID/EX และ EX/MEM ก่อนถูกใช้ที่ MEM"
+      },
+      {
+        "q": "ใน Clock 4 lw อยู่ MEM แต่ sw อยู่ ID, MemRead ของ lw มาจากไหน?",
+        "choices": [
+          "Main Control ปัจจุบัน",
+          "EX/MEM ของ lw",
+          "Forwarding Unit"
+        ],
+        "correct": 1,
+        "why": "เป็น Control ของ lw ที่ถูกสร้างไว้ก่อนแล้วส่งต่อมากับ Instruction ผ่าน Pipeline Registers"
+      }
+    ]
+  },
+  "additionCases": [
+    [
+      "1.1",
+      "Signed",
+      "0010",
+      "0100",
+      true
+    ],
+    [
+      "1.2",
+      "Unsigned",
+      "0010",
+      "0100",
+      false
+    ],
+    [
+      "1.3",
+      "Signed",
+      "0101",
+      "0110",
+      true
+    ],
+    [
+      "1.4",
+      "Unsigned",
+      "0101",
+      "0110",
+      false
+    ],
+    [
+      "1.5",
+      "Signed",
+      "1111",
+      "1011",
+      true
+    ],
+    [
+      "1.6",
+      "Signed",
+      "1001",
+      "1011",
+      true
+    ],
+    [
+      "1.7",
+      "Signed",
+      "1001",
+      "0011",
+      true
+    ],
+    [
+      "1.8",
+      "Signed",
+      "0111",
+      "1000",
+      true
+    ]
+  ],
+  "aluCases": [
+    [
+      "2.1",
+      "00",
+      "xxxxxx",
+      "ADD",
+      "0",
+      "0",
+      "0",
+      "10"
+    ],
+    [
+      "2.2",
+      "01",
+      "xxxxxx",
+      "SUB",
+      "0",
+      "1",
+      "1",
+      "10"
+    ],
+    [
+      "2.3",
+      "10",
+      "100000",
+      "ADD",
+      "0",
+      "0",
+      "0",
+      "10"
+    ],
+    [
+      "2.4",
+      "10",
+      "100010",
+      "SUB",
+      "0",
+      "1",
+      "1",
+      "10"
+    ],
+    [
+      "2.5",
+      "10",
+      "100100",
+      "AND",
+      "0",
+      "0",
+      "x",
+      "00"
+    ],
+    [
+      "2.6",
+      "10",
+      "100101",
+      "OR",
+      "0",
+      "0",
+      "x",
+      "01"
+    ],
+    [
+      "2.7",
+      "10",
+      "100111",
+      "NOR",
+      "1",
+      "1",
+      "x",
+      "00"
+    ],
+    [
+      "2.8",
+      "10",
+      "101010",
+      "SLT",
+      "0",
+      "1",
+      "1",
+      "11"
+    ]
+  ],
+  "signalA": [
+    "PCWrite",
+    "PCWriteCond",
+    "MemWrite",
+    "MemRead",
+    "IRWrite",
+    "RegWrite"
+  ],
+  "signalB": [
+    "PCSource",
+    "IorD",
+    "MemToReg",
+    "RegDst",
+    "ALUOp",
+    "ALUSrcA",
+    "ALUSrcB",
+    "Next State"
+  ],
+  "stateRows": [
+    {
+      "cmd": "all",
+      "s": 0,
+      "act": "IR ← Mem[PC], PC ← PC+4",
+      "a": [
+        "1",
+        "0",
+        "0",
+        "1",
+        "1",
+        "0"
+      ],
+      "b": [
+        "00",
+        "0",
+        "0",
+        "0",
+        "00",
+        "0",
+        "01",
+        "1"
+      ],
+      "flow": [
+        "PC",
+        "Memory & ALU +4",
+        "IR / PC"
+      ],
+      "why": "Fetch อ่านคำสั่งและเพิ่ม PC ทีละ 4 bytes"
+    },
+    {
+      "cmd": "j",
+      "s": 1,
+      "act": "PC ← Jump Address",
+      "a": [
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "b": [
+        "10",
+        "0",
+        "0",
+        "0",
+        "00",
+        "0",
+        "00",
+        "0"
+      ],
+      "flow": [
+        "Jump field",
+        "Jump Address",
+        "PC"
+      ],
+      "why": "Jump เลือก PCSource=10 และเปิด PCWrite แล้วกลับ State 0"
+    },
+    {
+      "cmd": "beq",
+      "s": 1,
+      "act": "ALUOut ← PC + (offset << 2)",
+      "a": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "b": [
+        "00",
+        "0",
+        "0",
+        "0",
+        "00",
+        "0",
+        "11",
+        "2"
+      ],
+      "flow": [
+        "PC + offset×4",
+        "ALU ADD",
+        "ALUOut"
+      ],
+      "why": "คำนวณ Branch Target ก่อน ยังไม่เปรียบเทียบ Register"
+    },
+    {
+      "cmd": "rtype",
+      "s": 1,
+      "act": "ALUOut ← Reg[rs] op Reg[rt]",
+      "a": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "b": [
+        "00",
+        "0",
+        "0",
+        "0",
+        "10",
+        "1",
+        "00",
+        "2"
+      ],
+      "flow": [
+        "Read rs + rt",
+        "ALU Funct",
+        "ALUOut"
+      ],
+      "why": "ใช้ Register สองตัวเข้า ALU; ALUOp=10 ให้ดู Funct"
+    },
+    {
+      "cmd": "lw",
+      "s": 1,
+      "act": "ALUOut ← Reg[rs] + Immediate",
+      "a": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "b": [
+        "00",
+        "0",
+        "0",
+        "0",
+        "00",
+        "1",
+        "10",
+        "2"
+      ],
+      "flow": [
+        "rs + Immediate",
+        "ALU ADD",
+        "ALUOut"
+      ],
+      "why": "หา Effective Address เท่านั้น ยังไม่อ่าน Memory"
+    },
+    {
+      "cmd": "sw",
+      "s": 1,
+      "act": "ALUOut ← Reg[rs] + Immediate",
+      "a": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "b": [
+        "00",
+        "0",
+        "0",
+        "0",
+        "00",
+        "1",
+        "10",
+        "2"
+      ],
+      "flow": [
+        "rs + Immediate",
+        "ALU ADD",
+        "ALUOut"
+      ],
+      "why": "เหมือน lw ทุกช่อง เพราะต้องหา Address ก่อน"
+    },
+    {
+      "cmd": "beq",
+      "s": 2,
+      "act": "ถ้า Reg[rs] = Reg[rt], PC ← ALUOut",
+      "a": [
+        "0",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "b": [
+        "01",
+        "0",
+        "0",
+        "0",
+        "01",
+        "1",
+        "00",
+        "0"
+      ],
+      "flow": [
+        "rs − rt",
+        "ALU Zero?",
+        "PC ← ALUOut"
+      ],
+      "why": "SUB เปรียบเทียบ Register; PCWriteCond ทำให้เปลี่ยน PC เฉพาะ Zero=1"
+    },
+    {
+      "cmd": "rtype",
+      "s": 2,
+      "act": "Reg[rd] ← ALUOut",
+      "a": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "1"
+      ],
+      "b": [
+        "00",
+        "0",
+        "0",
+        "1",
+        "00",
+        "0",
+        "00",
+        "0"
+      ],
+      "flow": [
+        "ALUOut",
+        "Write Back",
+        "Register rd"
+      ],
+      "why": "เปิด RegWrite, RegDst=1 เลือก rd, MemToReg=0 เลือก ALUOut"
+    },
+    {
+      "cmd": "lw",
+      "s": 2,
+      "act": "Reg[rt] ← Mem[ALUOut]",
+      "a": [
+        "0",
+        "0",
+        "0",
+        "1",
+        "0",
+        "1"
+      ],
+      "b": [
+        "00",
+        "1",
+        "1",
+        "0",
+        "00",
+        "0",
+        "00",
+        "0"
+      ],
+      "flow": [
+        "ALUOut = 1012",
+        "Memory Read = 77",
+        "Register rt = 77"
+      ],
+      "why": "IorD=1 ใช้ Address จาก ALUOut; MemRead=1, MemToReg=1, RegDst=0, RegWrite=1"
+    },
+    {
+      "cmd": "sw",
+      "s": 2,
+      "act": "Mem[ALUOut] ← Reg[rt]",
+      "a": [
+        "0",
+        "0",
+        "1",
+        "0",
+        "0",
+        "0"
+      ],
+      "b": [
+        "00",
+        "1",
+        "0",
+        "0",
+        "00",
+        "0",
+        "00",
+        "0"
+      ],
+      "flow": [
+        "ALUOut / rt",
+        "Memory Write",
+        "Memory[addr]"
+      ],
+      "why": "IorD=1 ให้ Address จาก ALUOut และ MemWrite=1 เขียนข้อมูลจาก rt"
+    }
+  ],
+  "hazardData": [
+    {
+      "id": "structural",
+      "title": "Structural Hazard",
+      "type": "อุปกรณ์ชนกัน",
+      "text": "I1 อยู่ MEM และ I4 อยู่ IF ใน Clock 4 ทั้งคู่ต้องอ่าน Memory เดียวกัน ถ้า Memory รองรับได้ทีละครั้งจะชนทรัพยากร",
+      "flow": [
+        "I1 → Data Memory",
+        "Memory 1 port",
+        "I4 → IF รอ"
+      ],
+      "sol": "แยก Instruction/Data Memory หรือเพิ่ม Memory Ports"
+    },
+    {
+      "id": "data",
+      "title": "RAW Data Hazard",
+      "type": "ผลยังไม่ Write Back",
+      "text": "addi เขียน $s0 แต่ ori ต้องใช้ $s0 ก่อนค่าถูกเขียนลง Register File",
+      "flow": [
+        "I1 EX: ผลพร้อม",
+        "Forwarding",
+        "I2 EX: ใช้ผลล่าสุด"
+      ],
+      "sol": "Forwarding / Bypassing ถ้าข้อมูลพร้อมแล้ว"
+    },
+    {
+      "id": "load",
+      "title": "Load-Use Hazard",
+      "type": "ข้อมูลยังไม่ออกจาก Memory",
+      "text": "lw อ่าน Data จบ MEM Clock 4 แต่ addi ต้องการค่าใน EX Clock 4 จึง Forward ไม่ทัน",
+      "flow": [
+        "lw MEM: Clock 4",
+        "Stall 1 cycle",
+        "addi EX: Clock 5"
+      ],
+      "sol": "Stall / Bubble หรือจัด Instruction Scheduling"
+    },
+    {
+      "id": "control",
+      "title": "Control Hazard",
+      "type": "ยังไม่รู้ทิศทาง Branch",
+      "text": "beq ตัดสิน Taken/Not Taken ใน EX Clock 3 แต่ CPU เริ่ม Fetch คำสั่งถัดไปตั้งแต่ Clock 2",
+      "flow": [
+        "Fetch ตาม PC+4",
+        "Branch ตัดสิน",
+        "Flush ถ้าผิดทาง"
+      ],
+      "sol": "Branch Prediction และ Flush เมื่อทำนายผิด"
+    }
+  ],
+  "pipeIns": [
+    {
+      "id": "I1",
+      "op": "lw",
+      "asm": "lw $t0,0($s1)",
+      "ex": [
+        "ALUSrc = 1",
+        "ALUOp = 00"
+      ],
+      "m": [
+        "MemRead = 1",
+        "MemWrite = 0"
+      ],
+      "wb": [
+        "RegWrite = 1",
+        "MemToReg = 1"
+      ]
+    },
+    {
+      "id": "I2",
+      "op": "add",
+      "asm": "add $t2,$t3,$t4",
+      "ex": [
+        "ALUSrc = 0",
+        "ALUOp = 10"
+      ],
+      "m": [
+        "MemRead = 0",
+        "MemWrite = 0"
+      ],
+      "wb": [
+        "RegWrite = 1",
+        "MemToReg = 0"
+      ]
+    },
+    {
+      "id": "I3",
+      "op": "sw",
+      "asm": "sw $t5,4($s1)",
+      "ex": [
+        "ALUSrc = 1",
+        "ALUOp = 00"
+      ],
+      "m": [
+        "MemRead = 0",
+        "MemWrite = 1"
+      ],
+      "wb": [
+        "RegWrite = 0",
+        "MemToReg = x"
+      ]
+    }
+  ]
+}

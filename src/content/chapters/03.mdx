@@ -1,0 +1,446 @@
+import { StateExplorer } from '../../components/SimulatorIslands.jsx';
+import ChapterCompletion from '../../components/ChapterCompletion.jsx';
+import SvgBlock from '../../components/SvgBlock.jsx';
+import SourceFigure from '../../components/SourceFigure.jsx';
+import MathBlock from '../../components/MathBlock.jsx';
+
+export const chapterInfo = {
+  "id": 3,
+  "title": "ข้อ 3: Multicycle Datapath",
+  "subtitle": "10 คะแนน · รูปที่ 2 · ตารางที่ 3 และ 4",
+  "short": "Multicycle Datapath",
+  "icon": "03",
+  "sections": [
+    {
+      "id": "ch3-section-1",
+      "title": "3.1 ทำความรู้จักอุปกรณ์"
+    },
+    {
+      "id": "ch3-section-2",
+      "title": "3.2 ก่อนเติมตาราง ต้องอ่าน MUX ให้ออก"
+    },
+    {
+      "id": "ch3-section-3",
+      "title": "3.3 แยก Control Signals เป็นสองโซน"
+    },
+    {
+      "id": "ch3-section-4",
+      "title": "3.4 พาทำ State 0 ให้ครบก่อน"
+    },
+    {
+      "id": "ch3-section-5",
+      "title": "3.5 ตัวอย่างเต็ม: State 1 ของ lw"
+    },
+    {
+      "id": "ch3-section-6",
+      "title": "3.6 State 2 ของ lw\\: ทำไม Control เป็นชุดนี้?"
+    },
+    {
+      "id": "ch3-section-7",
+      "title": "3.7 เปรียบเทียบคำสั่งที่เหลือ"
+    },
+    {
+      "id": "ch3-section-8",
+      "title": "3.8 ทดลองครบทั้งห้าคำสั่ง"
+    },
+    {
+      "id": "ch3-section-9",
+      "title": "3.9 เฉลยตารางที่ 3–4 ครบ"
+    },
+    {
+      "id": "ch3-section-10",
+      "title": "3.10 กลับมาดู Datapath ของโจทย์จริง"
+    }
+  ]
+};
+export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+<h1 className="hero-title">ข้อ 3: Multicycle Datapath</h1>
+
+10 คะแนน · รูปที่ 2 · ตารางที่ 3 และ 4
+
+ข้อ 3 เป็นการนำ ALU จากข้อ 2 มาใช้งานร่วมกับอุปกรณ์อื่นของ CPU
+
+สิ่งที่เราต้องทำไม่ใช่แค่หาว่าควร ADD หรือ SUB แต่ต้องรู้ว่า **ในแต่ละ State CPU จะใช้ข้อมูลจากไหน เปิดอุปกรณ์ใด และส่งผลไปที่ไหน**
+
+<section className="lesson-section" id="ch3-section-1">
+
+## 3.1 ทำความรู้จักอุปกรณ์
+
+| อุปกรณ์ | หน้าที่ |
+|--------|--------|
+| PC | เก็บ Address ของ Instruction ที่จะอ่าน |
+| IR | เก็บ Instruction ที่อ่านจาก Memory |
+| Register File | เก็บค่าของ Register เช่น `$s1`, `$t0` |
+| ALU | คำนวณและเปรียบเทียบ |
+| ALUOut | พักผล ALU ระหว่าง Clock |
+| Memory | เก็บ Instruction และข้อมูล |
+| MUX | เลือกแหล่งข้อมูล |
+| Main Control | สร้างสัญญาณควบคุมทั้งหมด |
+
+ตัวอย่าง
+
+```mips
+lw $t0, 12($s1)
+```
+
+สมมติ `$s1=1000` และ `Memory[1012]=77`
+
+เป้าหมายคือทำให้ `$t0=77`
+
+**State 0: Instruction Fetch**
+
+`IR ← Memory[PC]`
+
+`PC ← PC+4`
+
+**State 1: Address Calculation**
+
+`ALUOut ← 1000+12 = 1012`
+
+**State 2: Load + Write Back**
+
+`$t0 ← Memory[1012] = 77`
+
+**ทำไมต้องมี ALUOut?** เพราะ State 1 คำนวณ Address 1012 แล้ว State 2 จึงนำ Address นั้นไปใช้ ถ้าไม่มีที่พักผลข้าม Clock เราอาจรักษาค่าที่ต้องการไว้ไม่ได้
+
+เครื่องในข้อสอบนี้เป็น 3-state Multicycle Machine ซึ่งเป็นรูปแบบเฉพาะตามรูปที่ 2 ไม่ใช่จำนวน State ที่ใช้เหมือนกันใน CPU ทุกแบบ
+
+</section>
+
+<section className="lesson-section" id="ch3-section-2">
+
+## 3.2 ก่อนเติมตาราง ต้องอ่าน MUX ให้ออก
+
+MUX คือสวิตช์เลือกข้อมูลจากหลายแหล่ง
+
+ตัวอย่าง `ALUSrcA=1` หมายถึงเลือก Read data 1 จาก Register File แทน PC
+
+<SvgBlock source={"<svg viewBox=\"0 0 336 163\" width=\"100%\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"8\" y=\"10\" width=\"115\" height=\"38\" rx=\"7\" fill=\"#5285db\" fill-opacity=\".12\" stroke=\"#5285db\" /><text x=\"65\" y=\"26\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">PC</text><text x=\"65\" y=\"41\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">104</text><rect x=\"8\" y=\"103\" width=\"115\" height=\"42\" rx=\"7\" fill=\"#0d9488\" fill-opacity=\".12\" stroke=\"#0d9488\" /><text x=\"65\" y=\"120\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">Register rs</text><text x=\"65\" y=\"136\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">1000</text><path d=\"M123 29 H150 V52 H179\" stroke=\"#64748b\" stroke-width=\"1.8\" fill=\"none\" /><path d=\"M123 124 H150 V100 H179\" stroke=\"#0d9488\" stroke-width=\"3\" fill=\"none\" /><path d=\"M179 42 L224 58 L224 94 L179 110 Z\" stroke=\"#64748b\" stroke-width=\"1.5\" fill=\"#64748b\" fill-opacity=\".14\" /><text x=\"201\" y=\"81\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\" font-weight=\"700\">MUX</text><path d=\"M224 76 H314\" stroke=\"#0d9488\" stroke-width=\"3\" /><path d=\"M306 70 L314 76 L306 82\" stroke=\"#0d9488\" stroke-width=\"2\" fill=\"none\" /><text x=\"270\" y=\"64\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">ALU Input A</text><text x=\"270\" y=\"98\" font-size=\"18\" font-weight=\"700\" fill=\"#0d9488\" text-anchor=\"middle\">1000</text><text x=\"190\" y=\"141\" font-size=\"12\" fill=\"currentColor\">Select = 1</text></svg>"} />
+ทั้ง PC และ Register มีค่าอยู่ แต่ MUX เลือกส่งผ่านเพียงทางเดียว
+
+ค่า MUX ที่ใช้ในข้อสอบมีดังนี้
+
+| Control | ค่า | เลือกข้อมูล |
+|--------|--------|--------|
+| ALUSrcA | `0` | PC |
+| ALUSrcA | `1` | Read data 1 (rs) |
+| ALUSrcB | `00` | Read data 2 (rt) |
+| ALUSrcB | `01` | ค่าคงที่ 4 |
+| ALUSrcB | `10` | Sign-extended Immediate |
+| ALUSrcB | `11` | Sign-extended Immediate Shift Left 2 |
+| ALUOp | `00` | ADD |
+| ALUOp | `01` | SUB |
+| ALUOp | `10` | ใช้ Funct ของ R-type |
+
+สำหรับ Output ยังมี MUX อีกชุด
+
+| Control | ค่า 0 | ค่า 1 |
+|--------|--------|--------|
+| IorD | Memory Address จาก PC | จาก ALUOut |
+| MemToReg | Write data จาก ALUOut | จาก Memory |
+| RegDst | เขียน rt | เขียน rd |
+
+`PCSource` มี 3 ทางเลือก คือ `00` ผล ALU ปัจจุบัน, `01` ผลจาก ALUOut และ `10` Jump Address
+
+</section>
+
+<section className="lesson-section" id="ch3-section-3">
+
+## 3.3 แยก Control Signals เป็นสองโซน
+
+นี่คือวิธีหลักที่ใช้แก้ข้อ 3
+
+**โซน A**
+
+เปิด / ปิดการทำงาน
+
+---
+
+PCWrite
+
+PCWriteCond
+
+MemWrite
+
+MemRead
+
+IRWrite
+
+RegWrite
+
+**โซน B**
+
+เลือกเส้นทางข้อมูล
+
+---
+
+PCSource
+
+IorD
+
+MemToReg
+
+RegDst
+
+ALUOp
+
+ALUSrcA
+
+ALUSrcB
+
+Next State
+
+โซน A ถามว่า *ต้องอ่านหรือเขียนอะไรใน State นี้?* ถ้าไม่ได้ใช้งาน ให้ใส่ 0
+
+โซน B ถามว่า *ข้อมูลต้องมาจากไหนและไปไหน?* จึงเลือกค่าของ MUX ให้ตรง
+
+โจทย์กำหนดให้ Don't Care ใน Main Control ใส่ `0` เพื่อความสะดวกในการตรวจ แต่ `opcode` ที่ไม่สนใจใช้ `xxxxxx`
+
+</section>
+
+<section className="lesson-section" id="ch3-section-4">
+
+## 3.4 พาทำ State 0 ให้ครบก่อน
+
+State 0 เหมือนกันทุกคำสั่ง
+
+<MathBlock tex={"IR\\leftarrow Memory[PC]"} />
+
+<MathBlock tex={"PC\\leftarrow PC+4"} />
+
+เพราะ Instruction ใน MIPS มีความยาว 32-bit หรือ 4 bytes และ PC ชี้ Address แบบ Byte-addressed
+
+**โซน A\:** ต้องอ่าน Memory, เก็บ Instruction ลง IR และเขียน PC ใหม่
+
+| Signal | ค่า |
+|--------|--------|
+| PCWrite | 1 |
+| PCWriteCond | 0 |
+| MemWrite | 0 |
+| MemRead | 1 |
+| IRWrite | 1 |
+| RegWrite | 0 |
+
+**โซน B\:** ต้องให้ Memory ใช้ PC เป็น Address และให้ ALU คำนวณ PC+4
+
+| Signal | ค่า | ทำไม |
+|--------|--------|--------|
+| IorD | 0 | Memory ใช้ PC |
+| ALUSrcA | 0 | เลือก PC |
+| ALUSrcB | 01 | เลือกเลข 4 |
+| ALUOp | 00 | ADD |
+| PCSource | 00 | เลือกผล ALU เป็น PC ใหม่ |
+| Next State | 1 | ไป Decode/Execute |
+
+`MemToReg=0`, `RegDst=0` เพราะยังไม่มีการเขียน Register File
+
+</section>
+
+<section className="lesson-section" id="ch3-section-5">
+
+## 3.5 ตัวอย่างเต็ม: State 1 ของ `lw`
+
+```mips
+lw $t0, 12($s1)
+```
+
+สมมติ `$s1=1000`
+
+CPU ต้องคำนวณ
+
+<MathBlock tex={"ALUOut=1000+12=1012"} />
+
+<SvgBlock source={"<svg viewBox=\"0 0 330 148\" width=\"100%\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"5\" y=\"8\" width=\"108\" height=\"45\" rx=\"8\" stroke=\"#5285db\" fill=\"#5285db\" fill-opacity=\".12\" /><text x=\"59\" y=\"25\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">Register rs</text><text x=\"59\" y=\"43\" font-size=\"15\" font-weight=\"700\" fill=\"currentColor\" text-anchor=\"middle\">1000</text><rect x=\"5\" y=\"95\" width=\"108\" height=\"45\" rx=\"8\" stroke=\"#d97706\" fill=\"#d97706\" fill-opacity=\".12\" /><text x=\"59\" y=\"112\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">Immediate</text><text x=\"59\" y=\"130\" font-size=\"15\" font-weight=\"700\" fill=\"currentColor\" text-anchor=\"middle\">12</text><path d=\"M113 30 H135 V54 H152 M113 117 H135 V92 H152\" fill=\"none\" stroke=\"#5285db\" stroke-width=\"2\" /><rect x=\"152\" y=\"50\" width=\"72\" height=\"46\" rx=\"8\" stroke=\"#0d9488\" fill=\"#0d9488\" fill-opacity=\".1\" /><text x=\"188\" y=\"68\" font-size=\"13\" text-anchor=\"middle\" fill=\"currentColor\" font-weight=\"700\">ALU</text><text x=\"188\" y=\"83\" font-size=\"12\" text-anchor=\"middle\" fill=\"currentColor\">ADD</text><path d=\"M224 72 H243\" stroke=\"#0d9488\" stroke-width=\"2.5\" /><rect x=\"243\" y=\"50\" width=\"83\" height=\"46\" rx=\"8\" stroke=\"#0d9488\" fill=\"#0d9488\" fill-opacity=\".1\" /><text x=\"284\" y=\"67\" font-size=\"12\" text-anchor=\"middle\" fill=\"currentColor\">ALUOut</text><text x=\"284\" y=\"85\" font-size=\"16\" text-anchor=\"middle\" fill=\"currentColor\" font-weight=\"700\">1012</text><text x=\"188\" y=\"132\" font-size=\"11\" text-anchor=\"middle\" fill=\"currentColor\">ALUOp = 00</text></svg>"} />
+ALUSrcA = 1 ALUSrcB = 10 Next = 2
+
+ใน State นี้ยังไม่ต้องเปิด MemRead หรือ RegWrite เพราะเพียงคำนวณ Address
+
+ดังนั้นโซน A ทั้งหมดเป็น 0
+
+ส่วนโซน B ใช้
+
+- `ALUSrcA=1` เพื่ออ่านค่า Base Register
+- `ALUSrcB=10` เพื่อเลือก Offset
+- `ALUOp=00` เพื่อบวก
+- `Next=2` เพื่อไปทำ Memory Access
+
+พอ State 2 จึงนำ ALUOut ไปอ่าน Memory
+
+</section>
+
+<section className="lesson-section" id="ch3-section-6">
+
+## 3.6 State 2 ของ `lw`\: ทำไม Control เป็นชุดนี้?
+
+<MathBlock tex={"Reg[rt]\\leftarrow Memory[ALUOut]"} />
+
+Data Flow
+
+| Signal | ค่า | เพราะอะไร |
+|--------|--------|--------|
+| IorD | 1 | Address มาจาก ALUOut |
+| MemRead | 1 | ต้องอ่าน Memory |
+| MemToReg | 1 | Write data มาจาก Memory |
+| RegDst | 0 | เขียน rt |
+| RegWrite | 1 | ต้องบันทึกลง Register File |
+| Next | 0 | กลับไป Fetch |
+
+นี่คือวิธีทำที่ต้องใช้กับคำสั่งอื่น ๆ เช่นกัน เริ่มจาก Data Flow แล้วจึงแปลงเป็น Control
+
+</section>
+
+<section className="lesson-section" id="ch3-section-7">
+
+## 3.7 เปรียบเทียบคำสั่งที่เหลือ
+
+### `sw`\: เหมือน `lw` ตรงไหน?
+
+State 1 ของ `sw` เหมือน `lw` เพราะต้องคำนวณ Address ด้วย Base Register + Offset
+
+<MathBlock tex={"ALUOut=Reg[rs]+SignExt(Immediate)"} />
+
+แต่ State 2 ไม่ได้อ่าน Memory มาลง Register แต่ทำตรงข้าม
+
+<MathBlock tex={"Memory[ALUOut]\\leftarrow Reg[rt]"} />
+
+ดังนั้นเปิด `MemWrite=1`, `IorD=1` และไม่เปิด RegWrite
+
+### R-type: ทำไมต้องใช้ Funct?
+
+เช่น
+
+```mips
+add $t0,$t1,$t2
+```
+
+State 1 เลือกค่าจาก Register สองตัวเข้ามาคำนวณ แล้วเก็บผลใน ALUOut
+
+<MathBlock tex={"ALUOut=Reg[rs]\\ op\\ Reg[rt]"} />
+
+จึงตั้ง `ALUSrcA=1`, `ALUSrcB=00`, `ALUOp=10` เพื่อให้ Funct เลือก Operation จริง
+
+State 2 จึงเขียนผลลง `rd`
+
+`RegWrite=1`, `RegDst=1`, `MemToReg=0`
+
+### `beq`\: ทำไมใช้ ALU สองครั้ง?
+
+State 1 ใช้ ALU คำนวณ Branch Target
+
+<MathBlock tex={"ALUOut=PC+(SignExt(offset)\\ll2)"} />
+
+เลือก `ALUSrcA=0`, `ALUSrcB=11`, `ALUOp=00`
+
+State 2 ใช้ ALU ลบ Register สองตัวเพื่อเปรียบเทียบ
+
+<MathBlock tex={"Reg[rs]-Reg[rt]"} />
+
+ถ้าผลเป็นศูนย์ ALU จะให้ `Zero=1` และอนุญาตให้อัปเดต PC ไป Target ที่เก็บอยู่ใน ALUOut
+
+จึงใช้ `PCWriteCond=1` กับ `PCSource=01`
+
+**State 1**
+
+คำนวณ Branch Target → ALUOut
+
+**State 2**
+
+rs − rt → Zero?
+
+**Zero = 1**
+
+PC ← ALUOut
+
+**Zero = 0**
+
+ใช้ PC+4 เดิม
+
+### `j`\: ทำไมไม่มี State 2?
+
+Jump ไม่ต้องอ่านหรือเขียนข้อมูลจาก Register File
+
+หลังจาก State 0 Fetch คำสั่งแล้ว State 1 สามารถประกอบ Jump Address และเขียน PC ใหม่ได้เลย
+
+<MathBlock tex={"PC\\leftarrow\\{PC[31:28],IR[25:0],00\\}"} />
+
+ดังนั้น `PCWrite=1`, `PCSource=10`, `Next=0`
+
+</section>
+
+<section className="lesson-section" id="ch3-section-8">
+
+## 3.8 ทดลองครบทั้งห้าคำสั่ง
+
+<StateExplorer client:load />
+
+</section>
+
+<section className="lesson-section" id="ch3-section-9">
+
+## 3.9 เฉลยตารางที่ 3–4 ครบ
+
+ตารางที่ 3 ให้เติมขั้นตอนทำงาน ส่วนตารางที่ 4 ให้แปลงขั้นตอนเหล่านั้นเป็น Main Control
+
+| คำสั่ง | State 1 | State 2 |
+|--------|--------|--------|
+| j | Jump ไป Target | ไม่มี |
+| beq | คำนวณ Branch Target | SUB ตรวจ Zero และอาจเปลี่ยน PC |
+| R-type | ALU คำนวณ | เขียนผลลง rd |
+| lw | คำนวณ Address | อ่าน Memory แล้วเขียน rt |
+| sw | คำนวณ Address | เขียน rt ลง Memory |
+
+คำอธิบายที่หายไปสำหรับ `sw` State 2 คือ
+
+<MathBlock tex={"\\boxed{Mem[ALUOut]\\leftarrow Reg[IR[20:16]]}"} />
+
+**ตารางที่ 4 โซน A**
+
+| State / คำสั่ง | PCWrite | PCWriteCond | MemWrite | MemRead | IRWrite | RegWrite |
+|--------|--------|--------|--------|--------|--------|--------|
+| 0 ทุกคำสั่ง | 1 | 0 | 0 | 1 | 1 | 0 |
+| 1 j | 1 | 0 | 0 | 0 | 0 | 0 |
+| 1 beq | 0 | 0 | 0 | 0 | 0 | 0 |
+| 1 R-type | 0 | 0 | 0 | 0 | 0 | 0 |
+| 1 lw | 0 | 0 | 0 | 0 | 0 | 0 |
+| 1 sw | 0 | 0 | 0 | 0 | 0 | 0 |
+| 2 beq | 0 | 1 | 0 | 0 | 0 | 0 |
+| 2 R-type | 0 | 0 | 0 | 0 | 0 | 1 |
+| 2 lw | 0 | 0 | 0 | 1 | 0 | 1 |
+| 2 sw | 0 | 0 | 1 | 0 | 0 | 0 |
+
+**ตารางที่ 4 โซน B**
+
+| State / คำสั่ง | PCSource | IorD | MemToReg | RegDst | ALUOp | ALUSrcA | ALUSrcB | Next |
+|--------|--------|--------|--------|--------|--------|--------|--------|--------|
+| 0 ทุกคำสั่ง | 00 | 0 | 0 | 0 | 00 | 0 | 01 | 1 |
+| 1 j | 10 | 0 | 0 | 0 | 00 | 0 | 00 | 0 |
+| 1 beq | 00 | 0 | 0 | 0 | 00 | 0 | 11 | 2 |
+| 1 R-type | 00 | 0 | 0 | 0 | 10 | 1 | 00 | 2 |
+| 1 lw | 00 | 0 | 0 | 0 | 00 | 1 | 10 | 2 |
+| 1 sw | 00 | 0 | 0 | 0 | 00 | 1 | 10 | 2 |
+| 2 beq | 01 | 0 | 0 | 0 | 01 | 1 | 00 | 0 |
+| 2 R-type | 00 | 0 | 0 | 1 | 00 | 0 | 00 | 0 |
+| 2 lw | 00 | 1 | 1 | 0 | 00 | 0 | 00 | 0 |
+| 2 sw | 00 | 1 | 0 | 0 | 00 | 0 | 00 | 0 |
+
+Opcode ที่ใช้คือ R-type=`000000`, j=`000010`, beq=`000100`, lw=`100011`, sw=`101011` ส่วน State 0 ใช้ `xxxxxx`
+
+</section>
+
+<section className="lesson-section" id="ch3-section-10">
+
+## 3.10 กลับมาดู Datapath ของโจทย์จริง
+
+<SourceFigure client:load src={`${basePath}/images/q3_datapath.png`} alt="รูปที่ 2 Multicycle Machine" openLabel="เปิดรูปที่ 2 ขนาดเต็ม" aspectRatio="1.975" />
+
+ในภาพ เส้นสีส้มเป็นสาย Control ส่วนเส้นสีดำเป็น Data Paths ลองไล่จาก PC → Memory → IR แล้วค่อยตาม Register File → ALU → ALUOut และเส้นทางกลับไป Memory หรือ Register File
+
+**Mental Model\:** State บอกเวลาที่ต้องทำงาน, โซน A เปิดอุปกรณ์ และโซน B เลือกเส้นทางข้อมูล อย่าท่องตาราง เริ่มจาก Data Flow แล้วหา Control
+
+---
+
+</section>
+
+<ChapterCompletion client:load chapter={3} basePath={basePath} />
+<div className="lesson-nav"><a href={`${basePath}/study/2/`}>← ข้อ 2</a><a href={`${basePath}/study/4/`}>ข้อ 4 →</a></div>

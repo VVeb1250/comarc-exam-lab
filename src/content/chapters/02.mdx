@@ -1,0 +1,190 @@
+import { AluExplorer } from '../../components/SimulatorIslands.jsx';
+import ChapterCompletion from '../../components/ChapterCompletion.jsx';
+import SvgBlock from '../../components/SvgBlock.jsx';
+import SourceFigure from '../../components/SourceFigure.jsx';
+import MathBlock from '../../components/MathBlock.jsx';
+
+export const chapterInfo = {
+  "id": 2,
+  "title": "ข้อ 2: ALU Control",
+  "subtitle": "10 คะแนน · ข้อ 2.1–2.8 · รูปที่ 1",
+  "short": "ALU Control",
+  "icon": "02",
+  "sections": [
+    {
+      "id": "ch2-section-1",
+      "title": "2.1 ALU เป็นเครื่องคำนวณที่เลือกโหมดได้"
+    },
+    {
+      "id": "ch2-section-2",
+      "title": "2.2 ทำไมไม่มี SUB อยู่ใน Operation?"
+    },
+    {
+      "id": "ch2-section-3",
+      "title": "0010 = 2"
+    },
+    {
+      "id": "ch2-section-4",
+      "title": "2.3 แล้ว NOR และ SLT ทำอย่างไร?"
+    },
+    {
+      "id": "ch2-section-5",
+      "title": "2.4 ทดลองเลือก Operation"
+    },
+    {
+      "id": "ch2-section-6",
+      "title": "2.5 ALUOp กับ Funct ต่างจาก Operation อย่างไร?"
+    },
+    {
+      "id": "ch2-section-7",
+      "title": "2.6 เฉลยตารางที่ 1 ครบทุกข้อ"
+    }
+  ]
+};
+export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+<h1 className="hero-title">ข้อ 2: ALU Control</h1>
+
+10 คะแนน · ข้อ 2.1–2.8 · รูปที่ 1
+
+<section className="lesson-section" id="ch2-section-1">
+
+## 2.1 ALU เป็นเครื่องคำนวณที่เลือกโหมดได้
+
+ALU (Arithmetic Logic Unit) รับ Operand A และ B แล้วคำนวณผลตาม Control Signals เช่น ADD, SUB, AND, OR, NOR และ SLT
+
+ในรูปที่ 1 ของข้อสอบ เป็น ALU แบบ 32-bit ที่ประกอบจาก 1-bit ALU จำนวน 32 ตัวต่อกัน
+
+<SvgBlock source={"<svg viewBox=\"0 0 340 171\" width=\"100%\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"112\" y=\"24\" width=\"112\" height=\"114\" rx=\"10\" fill=\"#5285db\" fill-opacity=\".12\" stroke=\"#5285db\" stroke-width=\"1.8\" /><text x=\"168\" y=\"73\" font-size=\"24\" font-weight=\"700\" fill=\"currentColor\" text-anchor=\"middle\">ALU</text><text x=\"168\" y=\"96\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">32-bit</text><path d=\"M29 48 H110 M29 116 H110\" stroke=\"#5285db\" stroke-width=\"2.5\" fill=\"none\" /><text x=\"15\" y=\"52\" font-size=\"15\" fill=\"currentColor\">A</text><text x=\"15\" y=\"120\" font-size=\"15\" fill=\"currentColor\">B</text><path d=\"M224 79 H324\" stroke=\"#0d9488\" stroke-width=\"2.5\" fill=\"none\" /><path d=\"M315 73 L324 79 L315 85\" fill=\"none\" stroke=\"#0d9488\" stroke-width=\"2\" /><text x=\"272\" y=\"65\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">Result</text><path d=\"M168 166 V139\" stroke=\"#d97706\" stroke-width=\"2.5\" /><text x=\"181\" y=\"159\" font-size=\"12\" fill=\"currentColor\">Control</text></svg>"} />
+**Ainv กับ Binv เป็นตัวปรับอินพุต** ส่วน Operation เป็นตัวเลือกว่าจะนำผลของวงจรไหนออกมา
+
+สำหรับวงจรในโจทย์
+
+| Operation | ผลที่เลือก |
+|--------|--------|
+| `00` | AND |
+| `01` | OR |
+| `10` | ADD |
+| `11` | LESS |
+
+</section>
+
+<section className="lesson-section" id="ch2-section-2">
+
+## 2.2 ทำไมไม่มี SUB อยู่ใน Operation?
+
+เพราะวงจรบวกสามารถทำการลบได้ด้วย Two's Complement
+
+<MathBlock tex={"\\boxed{A-B=A+\\overline B+1}"} />
+
+ตัวอย่าง 5−3 แบบ 4-bit
+
+A **0101 (5)**
+
+B **0011 (3)**
+
+Binv = 1 ทำให้ B กลายเป็น **1100**
+
+CarryIn **0001**
+
+---
+
+**0101 + 1100 + 1**
+
+</section>
+
+<section className="lesson-section" id="ch2-section-3">
+
+## 0010 = 2
+
+จึงเลือก
+
+`Ainv=0`, `Binv=1`, `CarryIn=1`, `Operation=10`
+
+</section>
+
+<section className="lesson-section" id="ch2-section-4">
+
+## 2.3 แล้ว NOR และ SLT ทำอย่างไร?
+
+**NOR** ใช้กฎ De Morgan
+
+<MathBlock tex={"\\overline{A\\lor B}=\\overline A\\land\\overline B"} />
+
+ดังนั้นให้ Invert ทั้ง A และ B แล้วเลือก AND
+
+`Ainv=1`, `Binv=1`, `Operation=00`
+
+**SLT (Set on Less Than)** ให้ผลเป็น 1 เมื่อ A น้อยกว่า B แบบ Signed และเป็น 0 มิฉะนั้น
+
+วงจรคำนวณ A−B เพื่อเปรียบเทียบ แต่จะดู Sign bit ของผลลบอย่างเดียวไม่ได้ เพราะอาจเกิด Signed Overflow
+
+ใน 1-bit ALU ตัว MSB ของรูปที่ 1 จึงมี Overflow Detection และสร้างสัญญาณ Set ที่แก้ผลของ Overflow แล้ว
+
+<MathBlock tex={"Set=Sign(A-B)\\oplus Overflow"} />
+
+Set จะถูกส่งกลับไปยัง Less input ของ ALU บิตต่ำสุด เพื่อสร้างผลลัพธ์ 32-bit ที่มีค่า 0 หรือ 1
+
+</section>
+
+<section className="lesson-section" id="ch2-section-5">
+
+## 2.4 ทดลองเลือก Operation
+
+<AluExplorer client:load />
+
+</section>
+
+<section className="lesson-section" id="ch2-section-6">
+
+## 2.5 ALUOp กับ Funct ต่างจาก Operation อย่างไร?
+
+ในตารางที่ 1 โจทย์ให้ `ALUOp` และ `Funct` เป็น Input ของวงจร ALU Control
+
+อย่าสับสน\:
+
+- **ALUOp\:** บอกวิธีเลือกการทำงานระดับสูง
+- **Funct\:** ระบุว่าคำสั่ง R-type ต้องการคำนวณอะไร
+- **Operation\:** สัญญาณสุดท้ายที่เลือกวงจรย่อยของ ALU
+
+**ALUOp + Funct**
+
+**ALU Control**
+
+Decode ว่าต้องการ ADD / SUB / ...
+
+**Ainv + Binv + CarryIn + Operation**
+
+ควบคุมวงจร ALU จริง
+
+กรณี `ALUOp=00` สั่ง ADD โดยตรง, `ALUOp=01` สั่ง SUB โดยตรง และ `ALUOp=10` ใช้ Funct เลือกการทำงาน R-type
+
+จึงทำให้ข้อ 2.1 กับ 2.3 ได้ Control เหมือนกัน แม้ Input ของ ALU Control ต่างกัน
+
+</section>
+
+<section className="lesson-section" id="ch2-section-7">
+
+## 2.6 เฉลยตารางที่ 1 ครบทุกข้อ
+
+| ข้อ | Goal | Ainv | Binv | CarryIn | Operation |
+|--------|--------|--------|--------|--------|--------|
+| 2.1 | ADD | 0 | 0 | 0 | `10` |
+| 2.2 | SUB | 0 | 1 | 1 | `10` |
+| 2.3 | ADD | 0 | 0 | 0 | `10` |
+| 2.4 | SUB | 0 | 1 | 1 | `10` |
+| 2.5 | AND | 0 | 0 | x | `00` |
+| 2.6 | OR | 0 | 0 | x | `01` |
+| 2.7 | NOR | 1 | 1 | x | `00` |
+| 2.8 | SLT | 0 | 1 | 1 | `11` |
+
+`x` คือ Don't Care เพราะ CarryIn ไม่ส่งผลต่อผลลัพธ์ Logic ที่ถูกเลือก
+
+**Mental Model\:** เริ่มจาก Goal → เลือกวงจรที่ใช้ → ถ้าจำเป็นให้ Invert อินพุตหรือเพิ่ม CarryIn เพื่อสร้าง Operation ที่ต้องการ
+
+---
+
+</section>
+
+<ChapterCompletion client:load chapter={2} basePath={basePath} />
+<div className="lesson-nav"><a href={`${basePath}/study/1/`}>← ข้อ 1</a><a href={`${basePath}/study/3/`}>ข้อ 3 →</a></div>

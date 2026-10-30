@@ -1,0 +1,158 @@
+import { AdditionExplorer, SignedInterpretation } from '../../components/SimulatorIslands.jsx';
+import ChapterCompletion from '../../components/ChapterCompletion.jsx';
+import SvgBlock from '../../components/SvgBlock.jsx';
+import SourceFigure from '../../components/SourceFigure.jsx';
+import MathBlock from '../../components/MathBlock.jsx';
+
+export const chapterInfo = {
+  "id": 1,
+  "title": "ข้อ 1: Binary Arithmetic & Overflow",
+  "subtitle": "10 คะแนน · ข้อ 1.1–1.8",
+  "short": "Binary Arithmetic & Overflow",
+  "icon": "01",
+  "sections": [
+    {
+      "id": "ch1-section-1",
+      "title": "1.1 ทำไม 4-bit ถึงเก็บจำนวนลบได้?"
+    },
+    {
+      "id": "ch1-section-2",
+      "title": "1.2 Binary Addition คิดอย่างไร?"
+    },
+    {
+      "id": "ch1-section-3",
+      "title": "1.3 Overflow ไม่ใช่ Carry เสมอไป"
+    },
+    {
+      "id": "ch1-section-4",
+      "title": "1.4 ทดลองโจทย์ทุกข้อ"
+    },
+    {
+      "id": "ch1-section-5",
+      "title": "1.5 เฉลยข้อ 1 ครบทุกข้อ"
+    }
+  ]
+};
+export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+<h1 className="hero-title">ข้อ 1: Binary Arithmetic &amp; Overflow</h1>
+
+10 คะแนน · ข้อ 1.1–1.8
+
+<section className="lesson-section" id="ch1-section-1">
+
+## 1.1 ทำไม 4-bit ถึงเก็บจำนวนลบได้?
+
+โจทย์กำหนดระบบ 4-bit หมายความว่าเรามีพื้นที่เก็บตัวเลขเพียง 4 บิต เช่น `0110` หรือ `1111`
+
+ถ้าเป็น **Unsigned** ทุกบิตมีน้ำหนักเป็นบวก แต่ถ้าเป็น **Signed Two's Complement** บิตซ้ายสุดมีน้ำหนักเป็นลบ
+
+<SignedInterpretation client:load />
+
+นี่คือเหตุผลว่าทำไม Binary ชุดเดียวกันจึงอ่านออกมาได้ต่างกัน
+
+| ชนิดข้อมูล | ต่ำสุด | สูงสุด |
+|--------|--------|--------|
+| Unsigned 4-bit | 0 | 15 |
+| Signed 4-bit | \-8 | 7 |
+
+### วิธีหา Two's Complement
+
+ถ้าเห็น `1011` แล้วอยากรู้ว่ามันเป็นลบเท่าไร ให้กลับทุกบิตแล้วบวกหนึ่ง
+
+เลขเดิม **1011**
+
+Invert bits **0100**
+
+บวก 1 **0101 = 5**
+
+---
+
+ดังนั้น 1011 แทนค่า -5
+
+อีกวิธีที่เร็วมากสำหรับ 4-bit คือใช้น้ำหนัก `-8, 4, 2, 1` แล้วบวกรวมกันโดยตรง
+
+</section>
+
+<section className="lesson-section" id="ch1-section-2">
+
+## 1.2 Binary Addition คิดอย่างไร?
+
+การบวกฐานสองใช้กฎเดียวกับฐานสิบ เพียงแต่เลขฐานสองมีค่าได้แค่ 0 กับ 1
+
+| บิตที่บวก | ผล | Carry |
+|--------|--------|--------|
+| 0 + 0 | 0 | 0 |
+| 0 + 1 | 1 | 0 |
+| 1 + 1 | 0 | 1 |
+| 1 + 1 + Carry 1 | 1 | 1 |
+
+ตัวอย่างข้อ 1.3\:
+
+```text
+   0101   = 5
+ + 0110   = 6
+ --------
+   1011
+```
+
+ผลลัพธ์ 4-bit คือ `1011` แต่ 5+6 = 11 ซึ่งเกินช่วง Signed (-8 ถึง 7) จึงเกิด Overflow
+
+</section>
+
+<section className="lesson-section" id="ch1-section-3">
+
+## 1.3 Overflow ไม่ใช่ Carry เสมอไป
+
+**Overflow** หมายถึงผลจริงเกินช่วงที่ชนิดข้อมูลแทนได้
+
+สำหรับ Signed Addition ให้ตรวจเครื่องหมาย
+
+สำหรับ Unsigned Addition ให้ดู Carry out จากบิตที่ 4 ส่วน Signed ต้องพิจารณาเครื่องหมายของ Operand และ Result
+
+ตัวอย่างสำคัญคือข้อ 1.6
+
+```text
+   1001   = -7
+ + 1011   = -5
+ --------
+  10100
+```
+
+ฮาร์ดแวร์เก็บแค่ 4-bit จึงเหลือ `0100` ซึ่งเป็น +4
+
+แต่คำตอบจริงคือ -12 ต่ำกว่าค่าต่ำสุด -8 จึงเกิด Signed Overflow แม้ผลการบวกบิตของวงจรจะเป็นไปตามปกติ
+
+</section>
+
+<section className="lesson-section" id="ch1-section-4">
+
+## 1.4 ทดลองโจทย์ทุกข้อ
+
+<AdditionExplorer client:load />
+
+</section>
+
+<section className="lesson-section" id="ch1-section-5">
+
+## 1.5 เฉลยข้อ 1 ครบทุกข้อ
+
+| ข้อ | ค่าที่บวกจริง | Result | Overflow |
+|--------|--------|--------|--------|
+| 1.1 Signed | 2+4=6 | `0110` | False |
+| 1.2 Unsigned | 2+4=6 | `0110` | False |
+| 1.3 Signed | 5+6=11 | `1011` | **True** |
+| 1.4 Unsigned | 5+6=11 | `1011` | False |
+| 1.5 Signed | \-1+(-5)=-6 | `1010` | False |
+| 1.6 Signed | \-7+(-5)=-12 | `0100` | **True** |
+| 1.7 Signed | \-7+3=-4 | `1100` | False |
+| 1.8 Signed | 7+(-8)=-1 | `1111` | False |
+
+**Mental Model\:** บวกบิตให้ถูกก่อน แล้วตรวจว่าผลจริงอยู่ในช่วง Signed หรือ Unsigned ที่โจทย์กำหนดหรือไม่
+
+---
+
+</section>
+
+<ChapterCompletion client:load chapter={1} basePath={basePath} />
+<div className="lesson-nav"><a href={`${basePath}/study/6/`}>← ข้อ 6</a><a href={`${basePath}/study/2/`}>ข้อ 2 →</a></div>
