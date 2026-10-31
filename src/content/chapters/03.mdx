@@ -67,6 +67,8 @@ export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 ## 3.1 ทำความรู้จักอุปกรณ์
 
+<div className="table-scroll">
+
 | อุปกรณ์ | หน้าที่ |
 |--------|--------|
 | PC | เก็บ Address ของ Instruction ที่จะอ่าน |
@@ -77,6 +79,8 @@ export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 | Memory | เก็บ Instruction และข้อมูล |
 | MUX | เลือกแหล่งข้อมูล |
 | Main Control | สร้างสัญญาณควบคุมทั้งหมด |
+
+</div>
 
 ตัวอย่าง
 
@@ -382,6 +386,8 @@ Jump ไม่ต้องอ่านหรือเขียนข้อมู
 
 ตารางที่ 3 ให้เติมขั้นตอนทำงาน ส่วนตารางที่ 4 ให้แปลงขั้นตอนเหล่านั้นเป็น Main Control
 
+<div className="table-scroll">
+
 | คำสั่ง | State 1 | State 2 |
 |--------|--------|--------|
 | j | Jump ไป Target | ไม่มี |
@@ -390,11 +396,15 @@ Jump ไม่ต้องอ่านหรือเขียนข้อมู
 | lw | คำนวณ Address | อ่าน Memory แล้วเขียน rt |
 | sw | คำนวณ Address | เขียน rt ลง Memory |
 
+</div>
+
 คำอธิบายที่หายไปสำหรับ `sw` State 2 คือ
 
 <MathBlock tex={"\\boxed{Mem[ALUOut]\\leftarrow Reg[IR[20:16]]}"} />
 
 **ตารางที่ 4 โซน A**
+
+<div className="table-scroll">
 
 | State / คำสั่ง | PCWrite | PCWriteCond | MemWrite | MemRead | IRWrite | RegWrite |
 |--------|--------|--------|--------|--------|--------|--------|
@@ -409,7 +419,11 @@ Jump ไม่ต้องอ่านหรือเขียนข้อมู
 | 2 lw | 0 | 0 | 0 | 1 | 0 | 1 |
 | 2 sw | 0 | 0 | 1 | 0 | 0 | 0 |
 
+</div>
+
 **ตารางที่ 4 โซน B**
+
+<div className="table-scroll">
 
 | State / คำสั่ง | PCSource | IorD | MemToReg | RegDst | ALUOp | ALUSrcA | ALUSrcB | Next |
 |--------|--------|--------|--------|--------|--------|--------|--------|--------|
@@ -423,6 +437,8 @@ Jump ไม่ต้องอ่านหรือเขียนข้อมู
 | 2 R-type | 00 | 0 | 0 | 1 | 00 | 0 | 00 | 0 |
 | 2 lw | 00 | 1 | 1 | 0 | 00 | 0 | 00 | 0 |
 | 2 sw | 00 | 1 | 0 | 0 | 00 | 0 | 00 | 0 |
+
+</div>
 
 Opcode ที่ใช้คือ R-type=`000000`, j=`000010`, beq=`000100`, lw=`100011`, sw=`101011` ส่วน State 0 ใช้ `xxxxxx`
 

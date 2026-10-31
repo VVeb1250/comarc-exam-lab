@@ -133,9 +133,7 @@ ALU (Arithmetic Logic Unit) รับ Operand A และ B แล้วคำ�
 
 ในรูปที่ 1 ของข้อสอบ เป็น ALU แบบ 32-bit ที่ประกอบจาก 1-bit ALU จำนวน 32 ตัวต่อกัน
 
-```svg
-<svg viewBox="0 0 340 171" width="100%" xmlns="http://www.w3.org/2000/svg"><rect x="112" y="24" width="112" height="114" rx="10" fill="#5285db" fill-opacity=".12" stroke="#5285db" stroke-width="1.8" /><text x="168" y="73" font-size="24" font-weight="700" fill="currentColor" text-anchor="middle">ALU</text><text x="168" y="96" font-size="12" fill="currentColor" text-anchor="middle">32-bit</text><path d="M29 48 H110 M29 116 H110" stroke="#5285db" stroke-width="2.5" fill="none" /><text x="15" y="52" font-size="15" fill="currentColor">A</text><text x="15" y="120" font-size="15" fill="currentColor">B</text><path d="M224 79 H324" stroke="#0d9488" stroke-width="2.5" fill="none" /><path d="M315 73 L324 79 L315 85" fill="none" stroke="#0d9488" stroke-width="2" /><text x="272" y="65" font-size="12" fill="currentColor" text-anchor="middle">Result</text><path d="M168 166 V139" stroke="#d97706" stroke-width="2.5" /><text x="181" y="159" font-size="12" fill="currentColor">Control</text></svg>
-```
+![รูปที่ 1: ALU Internal Structure จากข้อสอบ B](public/images/fe2019b_q2_alu.png)
 
 **Ainv กับ Binv เป็นตัวปรับอินพุต** ส่วน Operation เป็นตัวเลือกว่าจะนำผลของวงจรไหนออกมา
 

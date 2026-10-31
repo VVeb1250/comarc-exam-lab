@@ -32,6 +32,7 @@ test('all six approved study chapters render their headings and source figures',
     await expect(page.locator('#page .lesson-section')).not.toHaveCount(0);
   }
   for (const [chapter, imageAlt, imageName] of [
+    [2, 'รูปที่ 1: ALU Internal Structure จากข้อสอบ B', 'fe2019b_q2_alu.png'],
     [3, 'รูปที่ 2 Multicycle Machine', 'q3_datapath.png'],
     [4, 'เฉลยข้อ 4 SRL Datapath พร้อมสายสี', 'fe2019b_q4_srl_wired.png'],
     [6, 'Pipeline Machine จากรูปที่ 5 ของข้อสอบ', 'fe2019b_q6_figure5.png'],
@@ -44,6 +45,12 @@ test('all six approved study chapters render their headings and source figures',
     await expect(image).toHaveAttribute('src', new RegExp(`/comarc-exam-lab/images/${imageName}$`));
     await expect.poll(() => image.evaluate((element) => element.complete && element.naturalWidth > 0)).toBe(true);
   }
+  await open(page, 'study/2/');
+  await page.getByRole('button', { name: 'ขยายภาพ รูปที่ 1: ALU Internal Structure จากข้อสอบ B' }).click();
+  await expect(page.getByRole('dialog', { name: 'ขยายภาพ' })).toBeVisible();
+  await expect(page.locator('#figure-modal img')).toHaveAttribute('src', /fe2019b_q2_alu\.png$/);
+  await page.getByRole('button', { name: 'ปิดภาพ' }).click();
+  await expect(page.getByRole('dialog', { name: 'ขยายภาพ' })).toHaveCount(0);
 });
 
 for (const chapter of siteData.chapters) {

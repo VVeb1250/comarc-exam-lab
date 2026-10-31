@@ -46,8 +46,9 @@ describe('preserved lesson editions', () => {
     });
   }
 
-  it('wires the three source figures to their original image names', () => {
+  it('wires the four source figures to their original image names', () => {
     const expected = [
+      ['02', 'fe2019b_q2_alu.png'],
       ['03', 'q3_datapath.png'],
       ['04', 'fe2019b_q4_srl_wired.png'],
       ['06', 'fe2019b_q6_figure5.png'],
