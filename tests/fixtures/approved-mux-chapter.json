@@ -1,0 +1,21 @@
+{
+  "title": "ข้อ 3: Multicycle Datapath & Control",
+  "sections": [
+    "อ่าน Datapath, MUX และ Instruction",
+    "เป้าหมายและเส้นทางการเรียน",
+    "บท 1/6: Instruction Fetch",
+    "บท 2/6: sw · Store Word",
+    "บท 3/6: lw · Load Word",
+    "บท 4/6: R-type",
+    "บท 5/6: beq · Branch",
+    "บท 6/6: j · Jump",
+    "สรุปตารางที่ 3 และ 4",
+    "ทวนภาพ Datapath"
+  ],
+  "requiredHeadings": [
+    "1. ก่อนอื่น อ่านภาพ Datapath ให้ออก",
+    "2. MUX คืออะไร ทำไมต้องเลือก?",
+    "3. อ่าน MUX ในภาพข้อสอบจริง",
+    "4. ก่อนเลือก MUX ต้องอ่าน Instruction เป็น"
+  ]
+}

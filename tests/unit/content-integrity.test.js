@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 const baseline = JSON.parse(readFileSync(new URL('../fixtures/current-site-baseline.json', import.meta.url), 'utf8'));
 const reference = readFileSync(new URL('../fixtures/approved-shared-textbook.md', import.meta.url), 'utf8');
+const muxChapter = JSON.parse(readFileSync(new URL('../fixtures/approved-mux-chapter.json', import.meta.url), 'utf8'));
 const chapterPath = (id, directory = 'content/chapters') => fileURLToPath(new URL(`../../src/${directory}/${String(id).padStart(2, '0')}.mdx`, import.meta.url));
 const hash = (value) => createHash('sha256').update(value.replace(/\r\n?/g, '\n')).digest('hex');
 const normalized = (value) => value
@@ -31,7 +32,7 @@ describe('preserved lesson editions', () => {
     });
   }
 
-  for (let id = 1; id <= 6; id += 1) {
+  for (const id of [1, 2, 4, 5, 6]) {
     it(`keeps approved source headings and SVG artwork for chapter ${id}`, () => {
       const mdx = readFileSync(chapterPath(id), 'utf8');
       const source = referenceChapter(id);
@@ -47,10 +48,25 @@ describe('preserved lesson editions', () => {
     });
   }
 
-  it('wires the four source figures to their original image names', () => {
+  it('keeps the revised MUX chapter opening, six lessons, and archived previous edition', () => {
+    const mdx = readFileSync(chapterPath(3), 'utf8');
+    const info = chapterInfo(mdx);
+    expect(normalized(info.title)).toBe(normalized(muxChapter.title));
+    expect(info.sections.map((section) => normalized(section.title))).toEqual(muxChapter.sections.map(normalized));
+    for (const heading of muxChapter.requiredHeadings) expect(mdx).toContain(heading);
+    expect([...mdx.matchAll(/\/images\/q3_datapath_full\.png/g)]).toHaveLength(2);
+
+    const archivePath = fileURLToPath(new URL('../../src/archive/chapter-03-previous.mdx', import.meta.url));
+    const archive = readFileSync(archivePath, 'utf8');
+    expect(chapterInfo(archive).title).toBe('ข้อ 3: Multicycle Datapath');
+    expect(archive).toContain('/images/q3_datapath.png');
+    expect(archive).toContain('3.10 กลับมาดู Datapath ของโจทย์จริง');
+  });
+
+  it('wires source figures to their lesson image names', () => {
     const expected = [
       ['02', 'fe2019b_q2_alu.png'],
-      ['03', 'q3_datapath.png'],
+      ['03', 'q3_datapath_full.png'],
       ['04', 'fe2019b_q4_srl_wired.png'],
       ['06', 'fe2019b_q6_figure5.png'],
     ];
@@ -60,6 +76,7 @@ describe('preserved lesson editions', () => {
       expect(mdx).toContain('SourceFigure client:load');
       expect(statSync(fileURLToPath(new URL(`../../public/images/${name}`, import.meta.url))).size).toBeGreaterThan(1_000);
     }
+    expect(statSync(fileURLToPath(new URL('../../public/images/q3_datapath.png', import.meta.url))).size).toBeGreaterThan(1_000);
   });
 
   it('keeps the reference interactive controls in the React islands', () => {

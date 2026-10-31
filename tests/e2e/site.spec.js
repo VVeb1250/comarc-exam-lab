@@ -33,7 +33,8 @@ test('all six approved study chapters render their headings and source figures',
   }
   for (const [chapter, imageAlt, imageName] of [
     [2, 'รูปที่ 1: ALU Internal Structure จากข้อสอบ B', 'fe2019b_q2_alu.png'],
-    [3, 'รูปที่ 2 Multicycle Machine', 'q3_datapath.png'],
+    [3, 'Multicycle Machine จากข้อสอบ FE2019b', 'q3_datapath_full.png'],
+    [3, 'Multicycle Machine จากข้อสอบ FE2019b สำหรับทวนท้ายบท', 'q3_datapath_full.png'],
     [4, 'เฉลยข้อ 4 SRL Datapath พร้อมสายสี', 'fe2019b_q4_srl_wired.png'],
     [6, 'Pipeline Machine จากรูปที่ 5 ของข้อสอบ', 'fe2019b_q6_figure5.png'],
   ]) {
@@ -69,14 +70,17 @@ test('lesson illustrations keep the reference layouts across all six chapters', 
   await expect(page.locator('#ch2-section-4 .alu-explorer .sim-stage')).toHaveCount(0);
 
   await open(page, 'study/3/');
-  await expect(page.locator('.multicycle-state-flow .multicycle-state-step')).toHaveCount(3);
-  await expect(page.locator('.multicycle-state-flow .address-step')).toHaveCSS('border-top-width', '1px');
-  const zones = page.locator('#ch3-section-3 .control-zone-wrap .zone');
-  await expect(zones).toHaveCount(2);
-  await expect(zones.first()).toHaveCSS('border-top-width', '1px');
-  await expect(zones.first().locator('.zone-title svg')).toHaveCSS('width', '18px');
-  await expect(zones.first().locator('.zone-signal code').first()).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-  await expect(zones.first().locator('.zone-description')).toHaveCSS('border-bottom-width', '1px');
+  await expect(page.locator('#ch3-primer h3')).toHaveText([
+    '1. ก่อนอื่น อ่านภาพ Datapath ให้ออก',
+    '2. MUX คืออะไร ทำไมต้องเลือก?',
+    '3. อ่าน MUX ในภาพข้อสอบจริง',
+    '4. ก่อนเลือก MUX ต้องอ่าน Instruction เป็น',
+  ]);
+  await expect(page.locator('.mc-step-card')).toHaveCount(10);
+  await expect(page.locator('.mc-control-zones')).toHaveCount(10);
+  await expect(page.locator('#ch3-fetch .mc-path-pair > div')).toHaveCount(2);
+  await expect(page.locator('#ch3-summary tbody tr')).toHaveCount(10);
+  await expect(page.locator('#ch3-last-figure .source-figure img')).toHaveAttribute('alt', 'Multicycle Machine จากข้อสอบ FE2019b สำหรับทวนท้ายบท');
 
   await open(page, 'study/4/');
   await expect(page.locator('#page .source-figure.loaded')).toHaveCount(1);
@@ -141,15 +145,13 @@ test('diagrams and controls remain readable in both themes', async ({ page }) =>
   expect(positions.result).toBeLessThan(positions.table);
 });
 
-test('multicycle controls and lesson tables have breathing room on desktop and mobile', async ({ page }) => {
+test('new Multicycle steps and lesson tables fit desktop and mobile', async ({ page }) => {
   await open(page, 'study/3/');
-  const zones = page.locator('#ch3-section-3 .control-zone-wrap');
-  await expect(zones.locator('.zone-a .zone-signal')).toHaveCount(6);
-  await expect(zones.locator('.zone-b .zone-signal')).toHaveCount(8);
-  const zoneSpacing = await zones.locator('.zone-signal-list').first().evaluate((element) => getComputedStyle(element).gap);
-  expect(zoneSpacing).toBe('3px');
+  const zones = page.locator('#ch3-sw .mc-control-zones').first();
+  const desktopColumns = await zones.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length);
+  expect(desktopColumns).toBe(2);
 
-  const table = page.locator('.table-scroll').first();
+  const table = page.locator('#ch3-primer .table-scroll').first();
   const desktopSpacing = await table.evaluate((element) => {
     const style = getComputedStyle(element);
     const cell = getComputedStyle(element.querySelector('td'));
@@ -158,8 +160,8 @@ test('multicycle controls and lesson tables have breathing room on desktop and m
   expect(desktopSpacing).toEqual({ top: 24, bottom: 30, cell: 14 });
 
   await page.setViewportSize({ width: 390, height: 844 });
-  const mobileZoneGap = await zones.locator('.zone-signal-list').first().evaluate((element) => getComputedStyle(element).gap);
-  expect(mobileZoneGap).toBe('3px');
+  const mobileColumns = await zones.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length);
+  expect(mobileColumns).toBe(1);
   const mobileSpacing = await table.evaluate((element) => {
     const style = getComputedStyle(element);
     const cell = getComputedStyle(element.querySelector('td'));
@@ -231,22 +233,12 @@ test('adder, ALU, multicycle control, shifter, hazards, and pipeline controls re
   }
 
   await open(page, 'study/3/');
-  const multicycle = page.locator('.simulator').first();
-  await expect(multicycle.getByRole('button', { name: 'beq', exact: true })).toHaveClass(/active/);
-  await expect(multicycle.getByRole('button', { name: 'State 2', exact: true })).toHaveClass(/active/);
-  await expect(multicycle.locator('.zone-a .zone-row').filter({ hasText: 'PCWriteCond' }).locator('b')).toHaveText('1');
-  const commands = ['j', 'beq', 'R-type', 'lw', 'sw'];
-  for (const [index, command] of commands.entries()) {
-    await multicycle.locator('.step-buttons').first().locator('button').nth(index).click();
-    await multicycle.locator('.step-buttons').nth(1).getByRole('button', { name: 'State 0', exact: true }).click();
-    await expect(multicycle.locator('.sim-hint')).toContainText('STATE 0');
-    await multicycle.locator('.step-buttons').nth(1).getByRole('button', { name: 'State 1', exact: true }).click();
-    await expect(multicycle.locator('.sim-hint')).toContainText('STATE 1');
-    if (command !== 'j') {
-      await multicycle.locator('.step-buttons').nth(1).getByRole('button', { name: 'State 2', exact: true }).click();
-      await expect(multicycle.locator('.sim-hint')).toContainText('STATE 2');
-    }
-  }
+  await expect(page.locator('#page .hero-title')).toHaveText(siteData.chapters[2].title);
+  await expect(page.locator('.mc-step-card')).toHaveCount(10);
+  await expect(page.locator('#ch3-sw .mc-data-operation').first()).toContainText('ALUOut ← 200 + 8 = 208');
+  await expect(page.locator('#ch3-lw .mc-control-zones').last()).toContainText('MemRead = 1');
+  await expect(page.locator('#ch3-beq .mc-control-zones').last()).toContainText('PCWriteCond = 1');
+  await expect(page.locator('#ch3-jump .mc-step-note')).toContainText('j ไม่มี State 2');
 
   await open(page, 'study/4/');
   const shifter = page.locator('.simulator').first();
