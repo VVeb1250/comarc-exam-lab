@@ -26,6 +26,21 @@ for (const route of routes) {
     const brokenImages = await page.locator('#page img').evaluateAll((images) =>
       images.filter((image) => !image.complete || image.naturalWidth === 0).map((image) => image.src));
     expect(brokenImages).toEqual([]);
+    const tableIssues = await page.locator('#page table').evaluateAll((tables) => tables.flatMap((table, index) => {
+      const wrapper = table.closest('.table-scroll');
+      const cell = table.querySelector('th, td');
+      const problems = [];
+      if (!wrapper) problems.push(`table ${index + 1} has no scroll frame`);
+      if (wrapper) {
+        const wrapperStyle = getComputedStyle(wrapper);
+        if (wrapperStyle.overflowX !== 'auto') problems.push(`table ${index + 1} has no independent horizontal scroll`);
+        if (parseFloat(wrapperStyle.marginTop) < 20 || parseFloat(wrapperStyle.marginBottom) < 20) problems.push(`table ${index + 1} has no vertical breathing room`);
+      }
+      const minimumCellPadding = table.classList.contains('compact') ? 8 : 12;
+      if (cell && parseFloat(getComputedStyle(cell).paddingTop) < minimumCellPadding) problems.push(`table ${index + 1} cells are compressed`);
+      return problems;
+    }));
+    expect(tableIssues).toEqual([]);
     expect(pageErrors).toEqual([]);
     expect(failedResponses).toEqual([]);
 
@@ -35,6 +50,21 @@ for (const route of routes) {
       content: document.documentElement.scrollWidth,
     }));
     expect(dimensions.content, 'page should not scroll horizontally on mobile').toBeLessThanOrEqual(dimensions.viewport);
+    const mobileTableIssues = await page.locator('#page table').evaluateAll((tables) => tables.flatMap((table, index) => {
+      const wrapper = table.closest('.table-scroll');
+      const cell = table.querySelector('th, td');
+      const problems = [];
+      if (!wrapper) problems.push(`table ${index + 1} has no scroll frame`);
+      if (wrapper) {
+        const wrapperStyle = getComputedStyle(wrapper);
+        if (wrapperStyle.overflowX !== 'auto') problems.push(`table ${index + 1} has no independent horizontal scroll`);
+        if (parseFloat(wrapperStyle.marginTop) < 18 || parseFloat(wrapperStyle.marginBottom) < 20) problems.push(`table ${index + 1} has no vertical breathing room`);
+      }
+      const minimumCellPadding = table.classList.contains('compact') ? 8 : 12;
+      if (cell && parseFloat(getComputedStyle(cell).paddingTop) < minimumCellPadding) problems.push(`table ${index + 1} cells are compressed`);
+      return problems;
+    }));
+    expect(mobileTableIssues).toEqual([]);
     await expect(page.locator('#page .hero-title')).toBeVisible();
     await expect.poll(() => page.locator('body').evaluate((body) => Number.parseFloat(getComputedStyle(body).fontSize))).toBe(16);
     expect(pageErrors).toEqual([]);

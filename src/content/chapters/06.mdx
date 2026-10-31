@@ -81,12 +81,16 @@ CPU จึงต้องเก็บ Control Signals ของแต่ละ I
 
 ## 6.2 Pipeline Register ต่างจาก Register File อย่างไร?
 
+<div className="table-scroll">
+
 | Register File | Pipeline Register |
 |--------|--------|
 | เก็บค่าของโปรแกรม เช่น `$t0` | เก็บข้อมูลที่เดินทางข้าม Stage |
 | มีหมายเลข Register | อยู่ระหว่าง Pipeline Stages |
 | อ่านและเขียนตามคำสั่ง | รับและส่ง Data/Control ตาม Clock |
 | ค่ายังคงอยู่จนถูกเขียนใหม่ | เปลี่ยนไปตาม Instruction ที่ไหลผ่าน |
+
+</div>
 
 Pipeline Register เก็บทั้ง Operand, ผลคำนวณ, หมายเลข Register ปลายทาง และ Control Signals ที่จำเป็นสำหรับ Stage ถัดไป
 
@@ -98,11 +102,15 @@ Pipeline Register เก็บทั้ง Operand, ผลคำนวณ, ห�
 
 Main Control สร้าง Control ใน ID แล้วแบ่งเป็นสามกลุ่ม
 
+<div className="table-scroll">
+
 | กลุ่ม | ตัวอย่าง | ใช้ที่ |
 |--------|--------|--------|
 | EX | ALUSrc, ALUOp, RegDst | EX |
 | M | MemRead, MemWrite, Branch | MEM |
 | WB | RegWrite, MemToReg | WB |
+
+</div>
 
 **ID: Main Control**
 
@@ -184,12 +192,16 @@ Main Control สร้าง Control สำหรับ `lw` เช่น
 
 สังเกตสี่ส่วนนี้ในรูป
 
+<div className="table-scroll">
+
 | จุด | สิ่งที่เก็บหรือทำ |
 |--------|--------|
 | Main Control ที่ ID | สร้าง Control จาก Instruction |
 | ID/EX | Data และ EX, M, WB Controls |
 | EX/MEM | ผล ALU, Data ที่ต้องใช้ต่อ และ M, WB Controls |
 | MEM/WB | ผลจาก Memory/ALU และ WB Controls |
+
+</div>
 
 **แล้ว Hazard Detection กับ Forwarding Unit ล่ะ?**
 

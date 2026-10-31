@@ -75,6 +75,8 @@ srl $t0, $t1, 3
 
 โจทย์ให้ Barrel Shifter ที่ประกอบด้วย MUX ห้าระดับ แต่ละระดับเลือกว่าใช้ค่าเดิมหรือค่าที่เลื่อนแล้ว
 
+<div className="table-scroll">
+
 | MUX | Control=1 ทำอะไร |
 |--------|--------|
 | s0 | Shift ขวา 1 bit |
@@ -82,6 +84,8 @@ srl $t0, $t1, 3
 | s2 | Shift ขวา 4 bits |
 | s3 | Shift ขวา 8 bits |
 | s4 | Shift ขวา 16 bits |
+
+</div>
 
 เหตุผลที่ใช้ 1, 2, 4, 8, 16 เพราะรวมกันให้เป็นค่าใดก็ได้ระหว่าง 0–31
 
@@ -155,6 +159,8 @@ Data in → เลื่อนตาม shamt → Data out
 
 ตารางนี้ช่วยเทียบสีบนภาพกับความหมายของสาย
 
+<div className="table-scroll">
+
 | สาย | จำนวนบิต | หน้าที่ |
 |--------|--------|--------|
 | IR<MathBlock tex={"20:16"} /> → Read register 2 | 5 | เลือก rt |
@@ -163,6 +169,8 @@ Data in → เลื่อนตาม shamt → Data out
 | Data out → Write data | 32 | ส่งผลกลับ Register File |
 | IR<MathBlock tex={"15:11"} /> → Write register | 5 | เลือก rd |
 | RegWrite = 1 | 1 | อนุญาตให้เขียนผล |
+
+</div>
 
 สำหรับ `srl` ไม่ต้องใช้ค่า Read data 1 เพราะ rs ไม่ใช่ Operand ต้นทาง
 

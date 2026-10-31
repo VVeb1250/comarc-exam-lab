@@ -125,6 +125,8 @@ MUX คือสวิตช์เลือกข้อมูลจากหล�
 
 ค่า MUX ที่ใช้ในข้อสอบมีดังนี้
 
+<div className="table-scroll">
+
 | Control | ค่า | เลือกข้อมูล |
 |--------|--------|--------|
 | ALUSrcA | `0` | PC |
@@ -137,13 +139,19 @@ MUX คือสวิตช์เลือกข้อมูลจากหล�
 | ALUOp | `01` | SUB |
 | ALUOp | `10` | ใช้ Funct ของ R-type |
 
+</div>
+
 สำหรับ Output ยังมี MUX อีกชุด
+
+<div className="table-scroll">
 
 | Control | ค่า 0 | ค่า 1 |
 |--------|--------|--------|
 | IorD | Memory Address จาก PC | จาก ALUOut |
 | MemToReg | Write data จาก ALUOut | จาก Memory |
 | RegDst | เขียน rt | เขียน rd |
+
+</div>
 
 `PCSource` มี 3 ทางเลือก คือ `00` ผล ALU ปัจจุบัน, `01` ผลจาก ALUOut และ `10` Jump Address
 
@@ -198,6 +206,8 @@ State 0 เหมือนกันทุกคำสั่ง
 
 **โซน A\:** ต้องอ่าน Memory, เก็บ Instruction ลง IR และเขียน PC ใหม่
 
+<div className="table-scroll">
+
 | Signal | ค่า |
 |--------|--------|
 | PCWrite | 1 |
@@ -207,7 +217,11 @@ State 0 เหมือนกันทุกคำสั่ง
 | IRWrite | 1 |
 | RegWrite | 0 |
 
+</div>
+
 **โซน B\:** ต้องให้ Memory ใช้ PC เป็น Address และให้ ALU คำนวณ PC+4
+
+<div className="table-scroll">
 
 | Signal | ค่า | ทำไม |
 |--------|--------|--------|
@@ -217,6 +231,8 @@ State 0 เหมือนกันทุกคำสั่ง
 | ALUOp | 00 | ADD |
 | PCSource | 00 | เลือกผล ALU เป็น PC ใหม่ |
 | Next State | 1 | ไป Decode/Execute |
+
+</div>
 
 `MemToReg=0`, `RegDst=0` เพราะยังไม่มีการเขียน Register File
 
@@ -262,6 +278,8 @@ ALUSrcA = 1 ALUSrcB = 10 Next = 2
 
 Data Flow
 
+<div className="table-scroll">
+
 | Signal | ค่า | เพราะอะไร |
 |--------|--------|--------|
 | IorD | 1 | Address มาจาก ALUOut |
@@ -270,6 +288,8 @@ Data Flow
 | RegDst | 0 | เขียน rt |
 | RegWrite | 1 | ต้องบันทึกลง Register File |
 | Next | 0 | กลับไป Fetch |
+
+</div>
 
 นี่คือวิธีทำที่ต้องใช้กับคำสั่งอื่น ๆ เช่นกัน เริ่มจาก Data Flow แล้วจึงแปลงเป็น Control
 

@@ -61,12 +61,16 @@ ALU (Arithmetic Logic Unit) รับ Operand A และ B แล้วคำ�
 
 สำหรับวงจรในโจทย์
 
+<div className="table-scroll">
+
 | Operation | ผลที่เลือก |
 |--------|--------|
 | `00` | AND |
 | `01` | OR |
 | `10` | ADD |
 | `11` | LESS |
+
+</div>
 
 </section>
 
@@ -168,6 +172,8 @@ Decode ว่าต้องการ ADD / SUB / ...
 
 ## 2.6 เฉลยตารางที่ 1 ครบทุกข้อ
 
+<div className="table-scroll">
+
 | ข้อ | Goal | Ainv | Binv | CarryIn | Operation |
 |--------|--------|--------|--------|--------|--------|
 | 2.1 | ADD | 0 | 0 | 0 | `10` |
@@ -178,6 +184,8 @@ Decode ว่าต้องการ ADD / SUB / ...
 | 2.6 | OR | 0 | 0 | x | `01` |
 | 2.7 | NOR | 1 | 1 | x | `00` |
 | 2.8 | SLT | 0 | 1 | 1 | `11` |
+
+</div>
 
 `x` คือ Don't Care เพราะ CarryIn ไม่ส่งผลต่อผลลัพธ์ Logic ที่ถูกเลือก
 

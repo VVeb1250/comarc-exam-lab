@@ -118,11 +118,15 @@ Clock 3 อาจมี I1 อยู่ EX, I2 อยู่ ID และ I3 อ�
 
 ดังนั้นผลจะเป็นดังนี้
 
+<div className="table-scroll">
+
 | Instructions | Cycles | เวลาใช้ 1 GHz | เวลาใช้ 1 µs |
 |--------|--------|--------|--------|
 | 1 | 5 | 5 ns | 5 µs |
 | 10 | 14 | 14 ns | 14 µs |
 | 1,000,000 | 1,000,004 | 1.000004 ms | 1.000004 s |
+
+</div>
 
 คอลัมน์ 1 GHz เป็นค่าที่ถูกตามความสัมพันธ์ระหว่าง Frequency กับ Period ส่วนอีกคอลัมน์แสดงผลตาม Period ที่โจทย์ระบุไว้โดยตรง
 
@@ -280,6 +284,8 @@ Stall คือการหยุดคำสั่งที่ต้องร�
 
 ตัวอย่าง Timeline ของ Load-Use
 
+<div className="table-scroll">
+
 | Clock | I1: lw | I2: addi |
 |--------|--------|--------|
 | 1 | IF |  |
@@ -289,6 +295,8 @@ Stall คือการหยุดคำสั่งที่ต้องร�
 | 5 | WB | EX |
 | 6 |  | MEM |
 | 7 |  | WB |
+
+</div>
 
 ใน Clock 4 คำสั่ง I2 ถูกพักไว้ และ Pipeline แทรก Bubble ใน EX แทน จากนั้นจึงไป EX ใน Clock 5 เมื่อสามารถรับข้อมูลจาก I1 ได้ทัน
 
@@ -360,6 +368,8 @@ addi: ใช้ผล lw
 
 ## 5.8 เฉลยข้อ 5 ครบ
 
+<div className="table-scroll">
+
 | ข้อ | คำตอบ | เหตุผล |
 |--------|--------|--------|
 | 5.1 | N+4 Cycles | 5 Stages, ไม่มี Stall |
@@ -372,6 +382,8 @@ addi: ใช้ผล lw
 | 5.8 | Instruction Scheduling | จัดลำดับคำสั่งลด Stall |
 | 5.9 | Control Hazard | Branch Prediction ช่วย |
 | 5.10 | Memory Stalls และ Structural Hazard บางกรณี | Cache / Memory Hierarchy |
+
+</div>
 
 **Mental Model\:** Pipeline ทำหลาย Instruction พร้อมกัน จึงต้องตรวจว่าแย่งอุปกรณ์หรือไม่ รอข้อมูลหรือไม่ และรู้เส้นทาง Instruction ถัดไปแล้วหรือยัง
 
