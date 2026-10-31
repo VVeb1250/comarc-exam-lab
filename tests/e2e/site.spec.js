@@ -103,6 +103,44 @@ test('lesson illustrations keep the reference layouts across all six chapters', 
   expect(useColors).toEqual(registerColors.map((colors) => colors[0]));
 });
 
+test('diagrams and controls remain readable in both themes', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page, 'study/2/');
+  const alu = page.locator('.alu-explorer');
+  await alu.getByRole('button', { name: 'AND', exact: true }).click();
+  await expect(alu.locator('.alu-dont-care')).toHaveText('X = ไม่สนใจค่า');
+  const image = page.locator('.source-figure img');
+  await expect.poll(() => image.evaluate((element) => element.complete && element.naturalWidth > 0)).toBe(true);
+  expect(await image.evaluate((element) => element.getBoundingClientRect().height)).toBeLessThanOrEqual(480);
+  for (const theme of ['light', 'dark']) {
+    const ratios = await page.evaluate((mode) => {
+      document.documentElement.dataset.theme = mode;
+      const styles = getComputedStyle(document.documentElement);
+      const luminance = (name) => {
+        const element = document.createElement('span');
+        element.style.color = styles.getPropertyValue(`--${name}`);
+        document.body.append(element);
+        const rgb = getComputedStyle(element).color.match(/[\d.]+/g).slice(0, 3).map(Number);
+        element.remove();
+        const [r, g, b] = rgb.map((value) => { const v = value / 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      return [['ink', 'bg'], ['secondary', 'surface'], ['faint', 'surface'], ['blue', 'blue-bg'], ['teal', 'teal-bg'], ['red', 'red-bg'], ['amber', 'amber-bg']].map(([foreground, background]) => {
+        const a = luminance(foreground), b = luminance(background);
+        return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+      });
+    }, theme);
+    for (const ratio of ratios) expect(ratio).toBeGreaterThanOrEqual(4.5);
+  }
+  await open(page, 'study/4/');
+  const rows = page.locator('#ch4-section-6 .table-scroll tr');
+  const heights = await rows.evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height));
+  expect(Math.max(...heights)).toBeLessThan(120);
+  const shifter = page.locator('#ch4-section-3 .shifter-explorer');
+  const positions = await shifter.evaluate((element) => ({ result: element.querySelector('.result-bar').getBoundingClientRect().top, table: element.querySelector('.table-scroll').getBoundingClientRect().top }));
+  expect(positions.result).toBeLessThan(positions.table);
+});
+
 test('multicycle controls and lesson tables have breathing room on desktop and mobile', async ({ page }) => {
   await open(page, 'study/3/');
   const zones = page.locator('#ch3-section-3 .control-zone-wrap');

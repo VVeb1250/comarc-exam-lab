@@ -101,7 +101,7 @@ srl $t0, $t1, 3
 
 ## 4.3 Interactive: ดูการทำงานแต่ละ MUX
 
-<ShifterExplorer client:load />
+<ShifterExplorer client:load referenceLayout />
 
 </section>
 
@@ -131,7 +131,7 @@ IR ส่งหมายเลข Register 9 ไปยัง Register File เ�
 
 ต้องให้ Data เดินทางดังนี้
 
-**IR<MathBlock tex={"20:16"} /> = rt**
+**IR[20:16] = rt**
 
 เลือก Register ต้นทาง
 
@@ -147,7 +147,7 @@ Data in → เลื่อนตาม shamt → Data out
 
 เก็บลง rd เมื่อ RegWrite=1
 
-ต้องมีสายควบคุมเพิ่มเติมจาก `IR[6:10]` ไปยัง s0–s4 ตาม Bit Position จริง คือ IR<MathBlock tex={"6"} /> ไป s0, IR<MathBlock tex={"7"} /> ไป s1 ต่อไปจนถึง IR<MathBlock tex={"10"} /> ไป s4
+ต้องมีสายควบคุมเพิ่มเติมจาก `IR[6:10]` ไปยัง s0–s4 ตาม Bit Position จริง คือ `IR[6]` ไป s0, `IR[7]` ไป s1 ต่อไปจนถึง `IR[10]` ไป s4
 
 </section>
 
@@ -163,11 +163,11 @@ Data in → เลื่อนตาม shamt → Data out
 
 | สาย | จำนวนบิต | หน้าที่ |
 |--------|--------|--------|
-| IR<MathBlock tex={"20:16"} /> → Read register 2 | 5 | เลือก rt |
+| `IR[20:16]` → Read register 2 | 5 | เลือก rt |
 | Read data 2 → Data in | 32 | ส่งข้อมูลเข้า Shifter |
-| IR<MathBlock tex={"6"} /> ถึง IR<MathBlock tex={"10"} /> → s0 ถึง s4 | 1 ต่อเส้น | ควบคุมระยะ Shift |
+| `IR[6]` ถึง `IR[10]` → s0 ถึง s4 | 1 ต่อเส้น | ควบคุมระยะ Shift |
 | Data out → Write data | 32 | ส่งผลกลับ Register File |
-| IR<MathBlock tex={"15:11"} /> → Write register | 5 | เลือก rd |
+| `IR[15:11]` → Write register | 5 | เลือก rd |
 | RegWrite = 1 | 1 | อนุญาตให้เขียนผล |
 
 </div>

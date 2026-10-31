@@ -140,13 +140,14 @@ export function AluExplorer({ referenceLayout = false }) {
         {!referenceLayout && <div className="mini-label">ALUOp {row[1]} · Funct {row[2]} · Goal {row[3]}</div>}
         <div className="signal-grid" role={referenceLayout ? 'group' : undefined} aria-label={referenceLayout ? `ALUOp ${row[1]}, Funct ${row[2]}, Operation ${row[7]}` : undefined}>
           {['Ainv', 'Binv', 'CarryIn', 'Operation'].map((field, fieldIndex) => (
-            <div className={`signal-card ${row[fieldIndex + 4] === '1' ? 'on' : ''}`} key={field}>
+            <div className={`signal-card ${row[fieldIndex + 4] === '1' ? 'on' : ''}${referenceLayout && field === 'Operation' ? ' operation-value' : ''}${referenceLayout && String(row[fieldIndex + 4]).toLowerCase() === 'x' ? ' dont-care' : ''}`} key={field}>
               <small>{field}</small><b>{row[fieldIndex + 4]}</b>
             </div>
           ))}
         </div>
       </div>
       <p className="sim-explanation">{explanations[row[3]]}</p>
+      {referenceLayout && row.slice(4, 8).some((value) => String(value).toLowerCase() === 'x') && <p className="alu-dont-care">X = ไม่สนใจค่า</p>}
     </div>
   );
 }
@@ -198,12 +199,13 @@ export function StateExplorer({ referenceLayout = false }) {
   );
 }
 
-export function ShifterExplorer() {
+export function ShifterExplorer({ referenceLayout = false }) {
   const [data, setData] = useState(40);
   const [amount, setAmount] = useState(3);
   const stages = calculateShiftStages(data, amount);
+  const result = <div className="result-bar"><span><small>Data in</small><strong>{data}</strong></span><span><small>Data out</small><strong className="good">{stages[4].after}</strong></span></div>;
   return (
-    <div className="simulator">
+    <div className={`simulator${referenceLayout ? ' shifter-explorer' : ''}`}>
       <SimulatorTitle detail="32-bit logical shift">Barrel Shifter Simulator</SimulatorTitle>
       <div className="control-row">
         <label>Data in</label>
@@ -215,6 +217,7 @@ export function ShifterExplorer() {
       </div>
       <div className="slider-row"><label htmlFor="shamt">Shift Amount</label><output>{amount} bits</output></div>
       <input id="shamt" type="range" min="0" max="31" value={amount} step="1" onChange={(event) => setAmount(Number(event.target.value))} />
+      {referenceLayout && result}
       <div className="sim-stage">
         <div className="sim-hint">shamt (s4 ถึง s0) · {amount.toString(2).padStart(5, '0')}</div>
         <div className="signal-grid five">
@@ -230,10 +233,7 @@ export function ShifterExplorer() {
         stage.on ? <code>{`${stage.before} >> ${stage.weight}`}</code> : 'ผ่านค่าเดิม',
         <strong>{stage.after}</strong>,
       ])} />
-      <div className="result-bar">
-        <span><small>Data in</small><strong>{data}</strong></span>
-        <span><small>Data out</small><strong className="good">{stages[4].after}</strong></span>
-      </div>
+      {!referenceLayout && result}
     </div>
   );
 }
