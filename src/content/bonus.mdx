@@ -1,5 +1,6 @@
 import InstructionFormatExplorer from '../components/InstructionFormatExplorer.jsx';
 import MathBlock from '../components/MathBlock.jsx';
+import ArchivedChapter3 from '../archive/chapter-03-previous.mdx';
 
 export const bonusInfo = {
   title: 'ส่วนเสริมกันเหนียว',
@@ -12,6 +13,7 @@ export const bonusInfo = {
     { id: 'bonus-pipeline', title: 'Pipeline, Stall และ Memory' },
     { id: 'bonus-stall-control', title: 'Hold และ Bubble' },
     { id: 'bonus-transfer', title: 'โจทย์พลิกและเช็กขอบเขต' },
+    { id: 'bonus-archive', title: 'Archive: ข้อ 3 ฉบับเดิม' },
   ],
 };
 
@@ -246,5 +248,18 @@ Control ของ `lw` ที่เดินทางอยู่ใน EX/MEM �
 </div>
 
 เริ่มจากดูว่า Instruction ต้องทำอะไร แล้วตามข้อมูลผ่าน Datapath และดูว่า Control หรือผลลัพธ์ต้องพร้อมใน State หรือ Stage ใด
+
+</section>
+
+<section className="lesson-section" id="bonus-archive">
+
+## Archive: ข้อ 3 ฉบับเดิม
+
+เก็บบท 3 ฉบับก่อนปรับใหม่ไว้ท้ายส่วนเสริม เพื่อเปิดย้อนดูหรือเทียบกับบทปัจจุบันได้
+
+<details className="archive-details">
+  <summary>เปิดดู Archive ของข้อ 3 ฉบับเดิม</summary>
+  <ArchivedChapter3 />
+</details>
 
 </section>

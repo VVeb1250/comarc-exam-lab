@@ -1,465 +1,486 @@
-import { StateExplorer } from '../../components/SimulatorIslands.jsx';
 import ChapterCompletion from '../../components/ChapterCompletion.jsx';
-import SvgBlock from '../../components/SvgBlock.jsx';
 import SourceFigure from '../../components/SourceFigure.jsx';
-import MathBlock from '../../components/MathBlock.jsx';
 
 export const chapterInfo = {
   "id": 3,
-  "title": "ข้อ 3: Multicycle Datapath",
-  "subtitle": "10 คะแนน · รูปที่ 2 · ตารางที่ 3 และ 4",
-  "short": "Multicycle Datapath",
+  "title": "ข้อ 3: Multicycle Datapath & Control",
+  "subtitle": "FE2019b · รูปที่ 2 · ตารางที่ 3–4",
+  "short": "Multicycle Datapath & Control",
   "icon": "03",
   "sections": [
-    {
-      "id": "ch3-section-1",
-      "title": "3.1 ทำความรู้จักอุปกรณ์"
-    },
-    {
-      "id": "ch3-section-2",
-      "title": "3.2 ก่อนเติมตาราง ต้องอ่าน MUX ให้ออก"
-    },
-    {
-      "id": "ch3-section-3",
-      "title": "3.3 แยก Control Signals เป็นสองโซน"
-    },
-    {
-      "id": "ch3-section-4",
-      "title": "3.4 พาทำ State 0 ให้ครบก่อน"
-    },
-    {
-      "id": "ch3-section-5",
-      "title": "3.5 ตัวอย่างเต็ม: State 1 ของ lw"
-    },
-    {
-      "id": "ch3-section-6",
-      "title": "3.6 State 2 ของ lw\\: ทำไม Control เป็นชุดนี้?"
-    },
-    {
-      "id": "ch3-section-7",
-      "title": "3.7 เปรียบเทียบคำสั่งที่เหลือ"
-    },
-    {
-      "id": "ch3-section-8",
-      "title": "3.8 ทดลองครบทั้งห้าคำสั่ง"
-    },
-    {
-      "id": "ch3-section-9",
-      "title": "3.9 เฉลยตารางที่ 3–4 ครบ"
-    },
-    {
-      "id": "ch3-section-10",
-      "title": "3.10 กลับมาดู Datapath ของโจทย์จริง"
-    }
+    { "id": "ch3-primer", "title": "อ่าน Datapath, MUX และ Instruction" },
+    { "id": "ch3-start", "title": "เป้าหมายและเส้นทางการเรียน" },
+    { "id": "ch3-fetch", "title": "บท 1/6: Instruction Fetch" },
+    { "id": "ch3-sw", "title": "บท 2/6: sw · Store Word" },
+    { "id": "ch3-lw", "title": "บท 3/6: lw · Load Word" },
+    { "id": "ch3-rtype", "title": "บท 4/6: R-type" },
+    { "id": "ch3-beq", "title": "บท 5/6: beq · Branch" },
+    { "id": "ch3-jump", "title": "บท 6/6: j · Jump" },
+    { "id": "ch3-summary", "title": "สรุปตารางที่ 3 และ 4" },
+    { "id": "ch3-last-figure", "title": "ทวนภาพ Datapath" }
   ]
 };
 export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-<h1 className="hero-title">ข้อ 3: Multicycle Datapath</h1>
+<h1 className="hero-title">ข้อ 3: Multicycle Datapath &amp; Control</h1>
 
-10 คะแนน · รูปที่ 2 · ตารางที่ 3 และ 4
+FE2019b • รูปที่ 2 • ตารางที่ 3–4
 
-ข้อ 3 เป็นการนำ ALU จากข้อ 2 มาใช้งานร่วมกับอุปกรณ์อื่นของ CPU
+รอบนี้ล็อก UI ให้เหมือนกันตลอดทั้ง 6 บท แต่ละ Step จะมีตำแหน่งเดิมเสมอ: **วงจรย่อจากข้อสอบ → DATA Operation → CONTROL โซน 1 (เลือกทาง) / โซน 2 (เปิดใช้งาน) → ผลที่ได้และ State ถัดไป**
 
-สิ่งที่เราต้องทำไม่ใช่แค่หาว่าควร ADD หรือ SUB แต่ต้องรู้ว่า **ในแต่ละ State CPU จะใช้ข้อมูลจากไหน เปิดอุปกรณ์ใด และส่งผลไปที่ไหน**
+<SourceFigure client:load src={`${basePath}/images/q3_datapath_full.png`} alt="Multicycle Machine จากข้อสอบ FE2019b" openLabel="เปิดภาพวงจรขนาดเต็ม" aspectRatio="1.692" />
 
-<section className="lesson-section" id="ch3-section-1">
+<section className="lesson-section" id="ch3-primer">
 
-## 3.1 ทำความรู้จักอุปกรณ์
+## สอนข้อ 3 ใหม่: อ่าน Datapath → เลือก MUX → Control Signals
+
+เราจะใช้ข้อ 3 จาก FE2019b จริง โดยเริ่มจากศูนย์ ไม่สมมติว่าอ่านวงจรเป็นอยู่แล้ว เป้าหมายของบทนี้คือ เมื่อเห็นคำสั่ง `lw`, `sw`, `beq`, `j` หรือ R-type จะมองภาพแล้วรู้ได้ว่าข้อมูลต้องวิ่งผ่านอุปกรณ์ไหน MUX เลือกช่องอะไร และต้องเปิด Control Signal ตัวใด
+
+### 1. ก่อนอื่น อ่านภาพ Datapath ให้ออก
+
+นี่คือรูปที่ 2 จากข้อสอบ หน้า 4 ภาพดูยุ่งเพราะเส้นเชื่อมกันเยอะ แต่จริง ๆ เราไม่จำเป็นต้องอ่านทุกเส้นพร้อมกัน
+
+แยกเป็น 2 ส่วนก่อน:
+
+- **เส้นสีดำ = Data Path** เส้นทางที่ข้อมูลวิ่ง เช่น ตัวเลขจาก Register ไป ALU
+- **เส้นสีส้ม = Control Signals** ตัวควบคุมว่าจะให้วงจรเลือกทางไหน อ่านหรือเขียนเมื่อไร
+
+#### รู้จักอุปกรณ์สำคัญ 6 ตัว
 
 <div className="table-scroll">
 
-| อุปกรณ์ | หน้าที่ |
-|--------|--------|
-| PC | เก็บ Address ของ Instruction ที่จะอ่าน |
-| IR | เก็บ Instruction ที่อ่านจาก Memory |
-| Register File | เก็บค่าของ Register เช่น `$s1`, `$t0` |
-| ALU | คำนวณและเปรียบเทียบ |
-| ALUOut | พักผล ALU ระหว่าง Clock |
-| Memory | เก็บ Instruction และข้อมูล |
-| MUX | เลือกแหล่งข้อมูล |
-| Main Control | สร้างสัญญาณควบคุมทั้งหมด |
+| อุปกรณ์ | ทำหน้าที่อะไร |
+|---|---|
+| PC | เก็บ Address ของคำสั่งที่จะอ่าน |
+| Memory | เก็บ Instruction และ Data |
+| Instruction Register (IR) | เก็บคำสั่งที่อ่านมา |
+| Registers | อ่าน/เขียนค่าใน Register เช่น `$s0`, `$t0` |
+| ALU | คำนวณบวก ลบ และ Logic รวมถึงคำนวณ Address |
+| MUX | เลือกว่าจะให้ข้อมูลจากช่องไหนผ่านไป |
 
 </div>
 
-ตัวอย่าง
+อุปกรณ์ที่สำคัญที่สุดสำหรับข้อนี้คือ MUX
+
+### 2. MUX คืออะไร ทำไมต้องเลือก?
+
+สมมติ ALU ต้องรับข้อมูล 2 ค่าเพื่อคำนวณ แต่ค่าที่ส่งเข้า ALU อาจมาจากหลายแหล่ง MUX จึงเลือกว่าจะแหล่งใดส่งต่อไป
+
+ตัวอย่าง MUX 2 ช่อง:
+
+<div className="table-scroll">
+
+| Select | ข้อมูลที่เลือก |
+|---|---|
+| 0 | Register |
+| 1 | Immediate |
+
+</div>
+
+ถ้าคำสั่งต้องใช้ค่าใน Register เราก็เลือก `0`; ถ้าต้องใช้ Immediate ก็เลือก `1`
+
+**สำคัญ:** เลข `0` กับ `1` ไม่ได้มีความหมายตายตัวว่าเป็น Register หรือ Immediate ต้องดูว่าในภาพวงจรจริงช่องนั้นต่อมาจากไหน
+
+### 3. อ่าน MUX ในภาพข้อสอบจริง
+
+กลับไปที่รูปที่ 2 ให้มอง MUX สามตำแหน่งก่อน:
+
+<div className="table-scroll">
+
+| Control ของ MUX | ช่องที่เลือก | ข้อมูลที่ส่งต่อ |
+|---|---:|---|
+| `ALUSrcA` | `0` | `PC` |
+| `ALUSrcA` | `1` | `Read data 1` จาก Register File |
+| `ALUSrcB` | `00` | `Read data 2` จาก Register |
+| `ALUSrcB` | `01` | ค่าคงที่ `4` |
+| `ALUSrcB` | `10` | Sign-extended Immediate |
+| `ALUSrcB` | `11` | Sign-extended Immediate ที่ Shift left 2 |
+| `PCSource` | `00` | ALU result โดยตรง |
+| `PCSource` | `01` | `ALUOut` (ผล ALU ที่เก็บไว้) |
+| `PCSource` | `10` | Jump address |
+
+</div>
+
+สังเกตว่า `ALUSrcB = 10` หมายถึงช่อง 2 ไม่ใช่เลขสิบ เพราะ Control Signal นี้มีขนาด 2 บิต นี่คือข้อมูลพื้นฐานที่ต้องอ่านออกก่อนเริ่มโจทย์
+
+### 4. ก่อนเลือก MUX ต้องอ่าน Instruction เป็น
+
+ใน MIPS Instruction มีขนาด 32 บิต โดยตำแหน่งบิตบอกว่าจะใช้งาน Register ไหน และ Immediate อยู่ตรงไหน
+
+ตัวอย่าง I-type: `sw $t0, 8($s1)`
+
+<div className="table-scroll">
+
+| Field | ขนาด | ความหมายในตัวอย่าง |
+|---|---:|---|
+| opcode | 6 bits | `sw` |
+| rs | 5 bits | `$s1` |
+| rt | 5 bits | `$t0` |
+| immediate | 16 bits | `8` |
+
+</div>
+
+เรียงจากบิต 31 ทางซ้าย ไปบิต 0 ทางขวา
+
+เวลามองรูป Datapath จะเจอ:
+
+<div className="table-scroll">
+
+| บิตจาก IR | ความหมาย |
+|---|---|
+| `[25:21]` | `rs`: Register ตัวแรก |
+| `[20:16]` | `rt`: Register ตัวที่สอง |
+| `[15:11]` | `rd`: Register ปลายทางของ R-type |
+| `[15:0]` | Immediate |
+| `[25:0]` | Jump target field |
+
+</div>
+
+ตัวอย่าง `sw $t0, 8($s1)` ให้แปลเป็นภาษาคนก่อน:
+
+> เอาค่าที่เก็บใน `$t0` ไปเขียนลง Memory ณ Address ที่คำนวณจาก `$s1 + 8`
+
+ถ้า `$s1 = 1000` และ `$t0 = 42` ผลที่ต้องเกิดคือ `Memory[1008] = 42` แค่นี้เราก็เริ่มรู้แล้วว่า ALU ต้องบวกอะไร และ Memory ต้องเขียนข้อมูลจากไหน
+
+</section>
+
+<section className="lesson-section" id="ch3-start">
+
+## ก่อนเริ่ม: CPU กำลังพยายามทำอะไร?
+
+### เส้นทางการเรียน
+
+<div className="exam-coverage-grid" aria-label="เส้นทางการเรียนข้อ 3 ทั้ง 6 บท">
+  <div><small>01</small><strong>Fetch</strong><span>พื้นฐานร่วม</span></div>
+  <div><small>02</small><strong>`sw`</strong><span>Store Word</span></div>
+  <div><small>03</small><strong>`lw`</strong><span>Load Word</span></div>
+  <div><small>04</small><strong>R-type</strong><span>ALU / Write Back</span></div>
+  <div><small>05</small><strong>`beq`</strong><span>Branch</span></div>
+  <div><small>06</small><strong>`j`</strong><span>Jump</span></div>
+</div>
+
+ใช้ตัวอย่างเดิมตลอดช่วง `sw` และ `lw`:
 
 ```mips
-lw $t0, 12($s1)
+sw $t0, 8($s1)
 ```
 
-สมมติ `$s1=1000` และ `Memory[1012]=77`
+สมมติ `$s1 = 200` และ `$t0 = 42` หมายถึงเอาค่า 42 ไปเขียนใน Memory ที่ Address `200 + 8 = 208`
 
-เป้าหมายคือทำให้ `$t0=77`
+<div className="mc-example-values" role="group" aria-label="ตัวอย่าง Store Word">
+  <div><small>Base</small><strong>200</strong></div>
+  <div aria-hidden="true">+</div>
+  <div><small>Offset</small><strong>8</strong></div>
+  <div aria-hidden="true">→</div>
+  <div><small>Address</small><strong>208</strong></div>
+  <div className="mc-example-result"><code>Memory[208] ← 42</code></div>
+</div>
 
-<div className="multicycle-state-flow" role="group" aria-label="lw ผ่าน State 0 ถึง State 2">
-  <div className="multicycle-state-step">
-    <strong>State 0: Instruction Fetch</strong>
-    <code>IR ← Memory[PC]</code>
-    <code>PC ← PC+4</code>
+จำความหมาย CONTROL สองโซนนี้ก่อน:
+
+<div className="two-paths">
+  <div><strong>1. เลือกทาง</strong><span>เลือกข้อมูลเข้า MUX และเลือกการคำนวณของ ALU</span></div>
+  <div><strong>2. เปิดใช้งาน</strong><span>อนุญาตให้อ่านหรือเขียน Memory, Register หรือ PC</span></div>
+</div>
+
+ค่าต่าง ๆ ที่จะเห็นเป็นเลขฐานสองตามช่อง MUX ในรูปข้อสอบ ไม่ใช่เลขที่ใช้คำนวณ ส่วนตัวเลข 200, 8, 42 เป็นค่าตัวอย่างที่เราสมมติเพื่อให้เห็นการทำงาน
+
+</section>
+
+<section className="lesson-section" id="ch3-fetch">
+
+## บท 1/6: ทุกคำสั่งใช้ร่วมกัน · Instruction Fetch
+
+**เป้าหมาย:** อ่าน Instruction เข้ามา และเตรียม PC สำหรับคำสั่งถัดไป
+
+### Step 0: Fetch + PC Update
+
+**State 0 → Next State 1**
+
+สมมติ `PC=1000` CPU ต้องอ่านคำสั่งจาก Memory Address 1000 มาเก็บไว้ใน IR พร้อมเพิ่ม PC เป็น 1004 เราแยกวงจรเป็นสองงานเพื่อให้ดูชัด แต่ทั้งคู่เกิดใน State 0 เดียวกัน
+
+<div className="mc-step-card">
+  <div className="mc-step-heading"><strong>วงจรย่อจากรูปที่ 2 ของข้อสอบ</strong><span>Step 0 · State 0</span></div>
+  <div className="mc-path-pair">
+    <div><strong>ทางที่ 1: อ่านคำสั่งจาก Memory</strong><code>PC 1000 → IorD 0 → Memory Read → IR</code><small>ALUOut ไม่ใช้</small></div>
+    <div><strong>ทางที่ 2: คำนวณ PC + 4</strong><code>PC 1000 + Constant 4 → ALU → PC 1004</code><small>SrcA 0 · SrcB 01</small></div>
   </div>
-  <div className="multicycle-state-arrow" aria-hidden="true">↓</div>
-  <div className="multicycle-state-step address-step">
-    <strong>State 1: Address Calculation</strong>
-    <code>ALUOut ← 1000+12 = 1012</code>
+  <div className="mc-data-operation"><small>DATA Operation · โจทย์ให้มาแล้ว</small><code>IR ← Mem[PC] ; PC ← PC + 4</code><span>ตัวอย่าง: IR ได้คำสั่ง / PC เปลี่ยน 1000 → 1004</span></div>
+  <div className="mc-control-zones">
+    <div><h4>1. เลือกทาง</h4><ul><li><code>IorD = 0</code> ให้ Memory ใช้ Address จาก PC</li><li><code>ALUSrcA = 0</code> ใช้ PC เข้า ALU</li><li><code>ALUSrcB = 01</code> เลือกค่าคงที่ 4</li><li><code>ALUOp = 00</code> สั่งให้ ALU บวก</li><li><code>PCSource = 00</code> นำผล ALU โดยตรงไปที่ PC</li></ul></div>
+    <div><h4>2. เปิดใช้งาน</h4><ul><li><code>MemRead = 1</code> อ่าน Instruction จาก Memory</li><li><code>IRWrite = 1</code> เก็บ Instruction ลง IR</li><li><code>PCWrite = 1</code> อัปเดต PC เป็น 1004</li></ul></div>
   </div>
-  <div className="multicycle-state-arrow" aria-hidden="true">↓</div>
-  <div className="multicycle-state-step load-step">
-    <strong>State 2: Load + Write Back</strong>
-    <code>$t0 ← Memory[1012] = 77</code>
+  <p className="mc-step-note"><code>IorD</code> เลือกว่าที่อยู่มาจากไหน ส่วน <code>MemRead</code> เป็นตัวอนุญาตให้อ่านจริง</p>
+  <div className="mc-step-footer">จบบท 1: Instruction Fetch <span>บทถัดไป: sw • Store Word</span></div>
+</div>
+
+</section>
+
+<section className="lesson-section" id="ch3-sw">
+
+## บท 2/6: เขียนค่าจาก Register ลง Memory · `sw`
+
+### `sw` • Store Word
+
+**เป้าหมาย:** `sw $t0, 8($s1) → Mem[208] ← 42`
+
+### Step 1/2: คำนวณ Address
+
+**State 1 → Next State 2**
+
+ต้องรู้ว่าจะเขียน Memory ช่องไหนก่อน จึงเอา Base Address จาก `$s1` ซึ่งมีค่า 200 มาบวก Immediate 8 ผลลัพธ์ 208 ถูกเก็บใน ALUOut
+
+<div className="mc-step-card">
+  <div className="mc-step-heading"><strong>วงจรย่อจากรูปที่ 2 ของข้อสอบ</strong><span>Step 1/2 · State 1</span></div>
+  <div className="mc-step-recap"><code>Register + Sign-extended Immediate → ALUOut</code><span>Reg[rs] 200 · SignExt Imm 8 · SrcA 1 · SrcB 10 · ALU + · ALUOut 208</span></div>
+  <div className="mc-data-operation"><small>DATA Operation · โจทย์ให้มาแล้ว</small><code>ALUOut ← Reg[IR[25:21]] + signext(IR[15:0])</code><span>ตัวอย่าง: ALUOut ← 200 + 8 = 208</span></div>
+  <div className="mc-control-zones">
+    <div><h4>1. เลือกทาง</h4><ul><li><code>ALUSrcA = 1</code> เลือก Register ตัวแรก</li><li><code>ALUSrcB = 10</code> เลือก Immediate ที่ช่อง 2</li><li><code>ALUOp = 00</code> ใช้การบวก</li></ul></div>
+    <div><h4>2. เปิดใช้งาน</h4><p>ไม่มีสัญญาณที่ต้องเปิดเพิ่ม ยังไม่เขียน Memory, Register File หรือ PC ผล ALU ถูกเก็บใน ALUOut ของวงจรตาม Clock</p></div>
   </div>
+  <p className="mc-step-note">ยังไม่เขียน Memory เพราะ Step นี้ทำแค่คำนวณ Address</p>
+  <div className="mc-step-footer">ผล: ALUOut = 208 <span>Next State 2</span></div>
 </div>
 
-**ทำไมต้องมี ALUOut?** เพราะ State 1 คำนวณ Address 1012 แล้ว State 2 จึงนำ Address นั้นไปใช้ ถ้าไม่มีที่พักผลข้าม Clock เราอาจรักษาค่าที่ต้องการไว้ไม่ได้
+### Step 2/2: เขียน Memory
 
-เครื่องในข้อสอบนี้เป็น 3-state Multicycle Machine ซึ่งเป็นรูปแบบเฉพาะตามรูปที่ 2 ไม่ใช่จำนวน State ที่ใช้เหมือนกันใน CPU ทุกแบบ
+**State 2 → Next State 0**
 
-</section>
+ตอนนี้ Address 208 พร้อมแล้ว เราส่ง ALUOut ไปที่ Address ของ Memory และส่งค่า 42 จาก Register `$t0` เข้าช่อง Write data ก่อนเปิด `MemWrite`
 
-<section className="lesson-section" id="ch3-section-2">
-
-## 3.2 ก่อนเติมตาราง ต้องอ่าน MUX ให้ออก
-
-MUX คือสวิตช์เลือกข้อมูลจากหลายแหล่ง
-
-ตัวอย่าง `ALUSrcA=1` หมายถึงเลือก Read data 1 จาก Register File แทน PC
-
-<SvgBlock source={"<svg viewBox=\"0 0 336 163\" width=\"100%\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"8\" y=\"10\" width=\"115\" height=\"38\" rx=\"7\" fill=\"#5285db\" fill-opacity=\".12\" stroke=\"#5285db\" /><text x=\"65\" y=\"26\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">PC</text><text x=\"65\" y=\"41\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">104</text><rect x=\"8\" y=\"103\" width=\"115\" height=\"42\" rx=\"7\" fill=\"#0d9488\" fill-opacity=\".12\" stroke=\"#0d9488\" /><text x=\"65\" y=\"120\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">Register rs</text><text x=\"65\" y=\"136\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">1000</text><path d=\"M123 29 H150 V52 H179\" stroke=\"#64748b\" stroke-width=\"1.8\" fill=\"none\" /><path d=\"M123 124 H150 V100 H179\" stroke=\"#0d9488\" stroke-width=\"3\" fill=\"none\" /><path d=\"M179 42 L224 58 L224 94 L179 110 Z\" stroke=\"#64748b\" stroke-width=\"1.5\" fill=\"#64748b\" fill-opacity=\".14\" /><text x=\"201\" y=\"81\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\" font-weight=\"700\">MUX</text><path d=\"M224 76 H314\" stroke=\"#0d9488\" stroke-width=\"3\" /><path d=\"M306 70 L314 76 L306 82\" stroke=\"#0d9488\" stroke-width=\"2\" fill=\"none\" /><text x=\"270\" y=\"64\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">ALU Input A</text><text x=\"270\" y=\"98\" font-size=\"18\" font-weight=\"700\" fill=\"#0d9488\" text-anchor=\"middle\">1000</text><text x=\"190\" y=\"141\" font-size=\"12\" fill=\"currentColor\">Select = 1</text></svg>"} />
-ทั้ง PC และ Register มีค่าอยู่ แต่ MUX เลือกส่งผ่านเพียงทางเดียว
-
-ค่า MUX ที่ใช้ในข้อสอบมีดังนี้
-
-<div className="table-scroll">
-
-| Control | ค่า | เลือกข้อมูล |
-|--------|--------|--------|
-| ALUSrcA | `0` | PC |
-| ALUSrcA | `1` | Read data 1 (rs) |
-| ALUSrcB | `00` | Read data 2 (rt) |
-| ALUSrcB | `01` | ค่าคงที่ 4 |
-| ALUSrcB | `10` | Sign-extended Immediate |
-| ALUSrcB | `11` | Sign-extended Immediate Shift Left 2 |
-| ALUOp | `00` | ADD |
-| ALUOp | `01` | SUB |
-| ALUOp | `10` | ใช้ Funct ของ R-type |
-
-</div>
-
-สำหรับ Output ยังมี MUX อีกชุด
-
-<div className="table-scroll">
-
-| Control | ค่า 0 | ค่า 1 |
-|--------|--------|--------|
-| IorD | Memory Address จาก PC | จาก ALUOut |
-| MemToReg | Write data จาก ALUOut | จาก Memory |
-| RegDst | เขียน rt | เขียน rd |
-
-</div>
-
-`PCSource` มี 3 ทางเลือก คือ `00` ผล ALU ปัจจุบัน, `01` ผลจาก ALUOut และ `10` Jump Address
-
-</section>
-
-<section className="lesson-section" id="ch3-section-3">
-
-## 3.3 แยก Control Signals เป็นสองโซน
-
-นี่คือวิธีหลักที่ใช้แก้ข้อ 3
-
-<div className="zone-wrap control-zone-wrap">
-  <div className="zone zone-a">
-    <div className="zone-title"><svg className="zone-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="#5285db" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v10"/><path d="M18.4 6.6a8 8 0 1 1-12.8 0"/></svg><span>โซน A</span></div>
-    <p className="zone-description">เปิด / ปิดการทำงาน</p>
-    <div className="zone-signal-list">
-      {['PCWrite', 'PCWriteCond', 'MemWrite', 'MemRead', 'IRWrite', 'RegWrite'].map((signal) => (
-        <div className="zone-signal" key={signal}><code>{signal}</code></div>
-      ))}
-    </div>
+<div className="mc-step-card">
+  <div className="mc-step-heading"><strong>วงจรย่อจากรูปที่ 2 ของข้อสอบ</strong><span>Step 2/2 · State 2</span></div>
+  <div className="mc-step-recap"><code>ALUOut เป็น Address / Reg[rt] เป็น Write data</code><span>ALUOut 208 · Reg[rt] 42 · IorD 1 → Memory: Address 208, Write data 42</span></div>
+  <div className="mc-data-operation"><small>DATA Operation · ต้องเติมในตารางที่ 3</small><code>Mem[ALUOut] ← Reg[IR[20:16]]</code><span>ตัวอย่าง: Mem[208] ← 42</span></div>
+  <div className="mc-control-zones">
+    <div><h4>1. เลือกทาง</h4><ul><li><code>IorD = 1</code> ใช้ ALUOut เป็น Memory Address</li></ul></div>
+    <div><h4>2. เปิดใช้งาน</h4><ul><li><code>MemWrite = 1</code> อนุญาตให้ Memory เขียนค่า 42</li></ul></div>
   </div>
-  <div className="zone zone-b">
-    <div className="zone-title"><svg className="zone-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4"/><path d="m8.6 13.5 6.8 4"/></svg><span>โซน B</span></div>
-    <p className="zone-description">เลือกเส้นทางข้อมูล</p>
-    <div className="zone-signal-list">
-      {['PCSource', 'IorD', 'MemToReg', 'RegDst', 'ALUOp', 'ALUSrcA', 'ALUSrcB', 'Next State'].map((signal) => (
-        <div className="zone-signal" key={signal}><code>{signal}</code></div>
-      ))}
-    </div>
+  <p className="mc-step-note">ในตารางที่ 3 ช่องนี้ต้องเติมทั้ง DATA Operation และ CONTROL</p>
+  <div className="mc-step-footer">จบบท 2: sw • Store Word <span>บทถัดไป: lw • Load Word</span></div>
+</div>
+
+</section>
+
+<section className="lesson-section" id="ch3-lw">
+
+## บท 3/6: อ่าน Memory กลับเข้า Register · `lw`
+
+### `lw` • Load Word
+
+**เป้าหมาย:** `lw $t0, 8($s1) → Reg[$t0] ← 42`
+
+### Step 1/2: คำนวณ Address
+
+**State 1 → Next State 2**
+
+เหมือน `sw` เพราะยังต้องการ Address `200+8=208` ต่างกันที่ขั้นถัดไปเท่านั้น ข้อมูล 208 จะถูกเก็บไว้ใน ALUOut
+
+<div className="mc-step-card">
+  <div className="mc-step-heading"><strong>วงจรย่อจากรูปที่ 2 ของข้อสอบ</strong><span>Step 1/2 · State 1</span></div>
+  <div className="mc-step-recap"><code>ใช้เส้นทางคำนวณ Address เดียวกับ sw</code><span>Reg[rs] 200 · SignExt Imm 8 · SrcA 1 · SrcB 10 · ALU + · ALUOut 208</span></div>
+  <div className="mc-data-operation"><small>DATA Operation · โจทย์ให้มาแล้ว</small><code>ALUOut ← Reg[IR[25:21]] + signext(IR[15:0])</code><span>ตัวอย่าง: ALUOut ← 208</span></div>
+  <div className="mc-control-zones">
+    <div><h4>1. เลือกทาง</h4><ul><li><code>ALUSrcA = 1</code> เลือก Register ตัวแรก</li><li><code>ALUSrcB = 10</code> เลือก Immediate ช่อง 2</li><li><code>ALUOp = 00</code> บวกเพื่อคำนวณ Address</li></ul></div>
+    <div><h4>2. เปิดใช้งาน</h4><p>ไม่มีสัญญาณที่ต้องเปิดเพิ่ม ยังไม่เขียน Memory, Register File หรือ PC ผล ALU ถูกเก็บใน ALUOut ของวงจรตาม Clock</p></div>
   </div>
+  <p className="mc-step-note">lw กับ sw ใช้ชุด CONTROL เดียวกันใน Step 1</p>
+  <div className="mc-step-footer">ผล: ALUOut = 208 <span>Next State 2</span></div>
 </div>
 
-โซน A ถามว่า *ต้องอ่านหรือเขียนอะไรใน State นี้?* ถ้าไม่ได้ใช้งาน ให้ใส่ 0
+### Step 2/2: อ่าน Memory และ Write Back
 
-โซน B ถามว่า *ข้อมูลต้องมาจากไหนและไปไหน?* จึงเลือกค่าของ MUX ให้ตรง
+**State 2 → Next State 0**
 
-โจทย์กำหนดให้ Don't Care ใน Main Control ใส่ `0` เพื่อความสะดวกในการตรวจ แต่ `opcode` ที่ไม่สนใจใช้ `xxxxxx`
+จาก Address 208 CPU อ่านข้อมูลใน Memory สมมติได้ 42 จากนั้นส่งค่า 42 ผ่าน `MemtoReg` ไปช่อง Write data ของ Register File และเลือก Register `rt` เป็นปลายทาง
+
+<div className="mc-step-card">
+  <div className="mc-step-heading"><strong>วงจรย่อจากรูปที่ 2 ของข้อสอบ</strong><span>Step 2/2 · State 2</span></div>
+  <div className="mc-step-recap"><code>ALUOut → IorD → Memory → MemtoReg → Register</code><span>ALUOut 208 · IorD 1 · Memory 42 · MemtoReg 1 · Reg[rt] 42 · RegDst = 0</span></div>
+  <div className="mc-data-operation"><small>DATA Operation · โจทย์ให้มาแล้ว</small><code>Reg[IR[20:16]] ← Mem[ALUOut]</code><span>ตัวอย่าง: Reg[$t0] ← Mem[208] = 42</span></div>
+  <div className="mc-control-zones">
+    <div><h4>1. เลือกทาง</h4><ul><li><code>IorD = 1</code> Memory ใช้ Address จาก ALUOut</li><li><code>MemtoReg = 1</code> เลือกข้อมูลจาก Memory</li><li><code>RegDst = 0</code> เลือก Register ปลายทาง rt</li></ul></div>
+    <div><h4>2. เปิดใช้งาน</h4><ul><li><code>MemRead = 1</code> อ่านข้อมูลจาก Memory</li><li><code>RegWrite = 1</code> เขียนค่า 42 ลง Register</li></ul></div>
+  </div>
+  <p className="mc-step-note">MemtoReg เลือกข้อมูลที่จะเขียน ส่วน RegDst เลือก Register ที่จะรับข้อมูล</p>
+  <div className="mc-step-footer">จบบท 3: lw • Load Word <span>บทถัดไป: R-type • ALU Operation</span></div>
+</div>
 
 </section>
 
-<section className="lesson-section" id="ch3-section-4">
+<section className="lesson-section" id="ch3-rtype">
 
-## 3.4 พาทำ State 0 ให้ครบก่อน
+## บท 4/6: คำนวณด้วย Register สองตัว แล้ว Write Back
 
-State 0 เหมือนกันทุกคำสั่ง
+### R-type • ALU Operation
 
-<MathBlock tex={"IR\\leftarrow Memory[PC]"} />
+**เป้าหมาย:** `add $t0, $s1, $s2 → Reg[$t0] ← 12`
 
-<MathBlock tex={"PC\\leftarrow PC+4"} />
+### Step 1/2: ALU คำนวณ
 
-เพราะ Instruction ใน MIPS มีความยาว 32-bit หรือ 4 bytes และ PC ชี้ Address แบบ Byte-addressed
+**State 1 → Next State 2**
 
-**โซน A\:** ต้องอ่าน Memory, เก็บ Instruction ลง IR และเขียน PC ใหม่
+สมมติ `$s1=5` และ `$s2=7` คำสั่ง `add` ต้องเอา Register ทั้งสองตัวเข้า ALU โดยไม่ใช้ Immediate และ R-type ใช้ฟิลด์ `funct` ของ Instruction เพื่อระบุ Operation จริง
 
-<div className="table-scroll">
-
-| Signal | ค่า |
-|--------|--------|
-| PCWrite | 1 |
-| PCWriteCond | 0 |
-| MemWrite | 0 |
-| MemRead | 1 |
-| IRWrite | 1 |
-| RegWrite | 0 |
-
+<div className="mc-step-card">
+  <div className="mc-step-heading"><strong>วงจรย่อจากรูปที่ 2 ของข้อสอบ</strong><span>Step 1/2 · State 1</span></div>
+  <div className="mc-step-recap"><code>Register ตัวแรกและตัวที่สอง → ALUOut</code><span>Reg[rs] 5 · Reg[rt] 7 · SrcA 1 · SrcB 00 · ALU funct · ALUOut 12</span></div>
+  <div className="mc-data-operation"><small>DATA Operation · โจทย์ให้มาแล้ว</small><code>ALUOut ← Reg[IR[25:21]] op Reg[IR[20:16]]</code><span>ตัวอย่าง: สำหรับ add, ALUOut ← 5 + 7 = 12</span></div>
+  <div className="mc-control-zones">
+    <div><h4>1. เลือกทาง</h4><ul><li><code>ALUSrcA = 1</code> ใช้ Register ตัวแรก</li><li><code>ALUSrcB = 00</code> ใช้ Register ตัวที่สอง</li><li><code>ALUOp = 10</code> ให้ ALU Control อ่าน funct</li></ul></div>
+    <div><h4>2. เปิดใช้งาน</h4><p>ไม่มีสัญญาณที่ต้องเปิดเพิ่ม ยังไม่เขียน Memory, Register File หรือ PC ผล ALU ถูกเก็บใน ALUOut ของวงจรตาม Clock</p></div>
+  </div>
+  <p className="mc-step-note"><code>ALUOp=10</code> ไม่ได้แปลว่าบวกเสมอ แต่ให้เลือก Operation จาก funct</p>
+  <div className="mc-step-footer">ผล: ALUOut = 12 <span>Next State 2</span></div>
 </div>
 
-**โซน B\:** ต้องให้ Memory ใช้ PC เป็น Address และให้ ALU คำนวณ PC+4
+### Step 2/2: Write Back ไป rd
 
-<div className="table-scroll">
+**State 2 → Next State 0**
 
-| Signal | ค่า | ทำไม |
-|--------|--------|--------|
-| IorD | 0 | Memory ใช้ PC |
-| ALUSrcA | 0 | เลือก PC |
-| ALUSrcB | 01 | เลือกเลข 4 |
-| ALUOp | 00 | ADD |
-| PCSource | 00 | เลือกผล ALU เป็น PC ใหม่ |
-| Next State | 1 | ไป Decode/Execute |
+ผล 12 อยู่ใน ALUOut แล้ว ต้องส่งผลนี้กลับไปเขียน Register ปลายทางของ R-type ซึ่งอยู่ในฟิลด์ `rd` ที่บิต `IR[15:11]`
 
+<div className="mc-step-card">
+  <div className="mc-step-heading"><strong>วงจรย่อจากรูปที่ 2 ของข้อสอบ</strong><span>Step 2/2 · State 2</span></div>
+  <div className="mc-step-recap"><code>ALUOut → MemtoReg → Register File</code><span>ALUOut 12 · Memory ไม่ใช้ · MemtoReg 0 · Write data 12 · RegDst=1 → rd · RegWrite=1</span></div>
+  <div className="mc-data-operation"><small>DATA Operation · โจทย์ให้มาแล้ว</small><code>Reg[IR[15:11]] ← ALUOut</code><span>ตัวอย่าง: Reg[$t0] ← 12</span></div>
+  <div className="mc-control-zones">
+    <div><h4>1. เลือกทาง</h4><ul><li><code>MemtoReg = 0</code> เลือกค่า ALUOut ไม่ใช่ Memory</li><li><code>RegDst = 1</code> เลือกฟิลด์ rd เป็นปลายทาง</li></ul></div>
+    <div><h4>2. เปิดใช้งาน</h4><ul><li><code>RegWrite = 1</code> อนุญาตเขียนผลลง Register</li></ul></div>
+  </div>
+  <p className="mc-step-note">R-type ใช้ rd (`RegDst=1`) แต่ lw ใช้ rt (`RegDst=0`)</p>
+  <div className="mc-step-footer">จบบท 4: R-type • ALU Operation <span>บทถัดไป: beq • Branch if Equal</span></div>
 </div>
-
-`MemToReg=0`, `RegDst=0` เพราะยังไม่มีการเขียน Register File
 
 </section>
 
-<section className="lesson-section" id="ch3-section-5">
+<section className="lesson-section" id="ch3-beq">
 
-## 3.5 ตัวอย่างเต็ม: State 1 ของ `lw`
+## บท 5/6: คำนวณ Branch Target แล้วตรวจเงื่อนไข
 
-```mips
-lw $t0, 12($s1)
-```
+### `beq` • Branch if Equal
 
-สมมติ `$s1=1000`
+**เป้าหมาย:** ถ้า `Reg[rs] = Reg[rt]` ให้ `PC ← Branch Target`
 
-CPU ต้องคำนวณ
+### Step 1/2: เตรียม Branch Target
 
-<MathBlock tex={"ALUOut=1000+12=1012"} />
+**State 1 → Next State 2**
 
-<SvgBlock source={"<svg viewBox=\"0 0 330 148\" width=\"100%\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"5\" y=\"8\" width=\"108\" height=\"45\" rx=\"8\" stroke=\"#5285db\" fill=\"#5285db\" fill-opacity=\".12\" /><text x=\"59\" y=\"25\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">Register rs</text><text x=\"59\" y=\"43\" font-size=\"15\" font-weight=\"700\" fill=\"currentColor\" text-anchor=\"middle\">1000</text><rect x=\"5\" y=\"95\" width=\"108\" height=\"45\" rx=\"8\" stroke=\"#d97706\" fill=\"#d97706\" fill-opacity=\".12\" /><text x=\"59\" y=\"112\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">Immediate</text><text x=\"59\" y=\"130\" font-size=\"15\" font-weight=\"700\" fill=\"currentColor\" text-anchor=\"middle\">12</text><path d=\"M113 30 H135 V54 H152 M113 117 H135 V92 H152\" fill=\"none\" stroke=\"#5285db\" stroke-width=\"2\" /><rect x=\"152\" y=\"50\" width=\"72\" height=\"46\" rx=\"8\" stroke=\"#0d9488\" fill=\"#0d9488\" fill-opacity=\".1\" /><text x=\"188\" y=\"68\" font-size=\"13\" text-anchor=\"middle\" fill=\"currentColor\" font-weight=\"700\">ALU</text><text x=\"188\" y=\"83\" font-size=\"12\" text-anchor=\"middle\" fill=\"currentColor\">ADD</text><path d=\"M224 72 H243\" stroke=\"#0d9488\" stroke-width=\"2.5\" /><rect x=\"243\" y=\"50\" width=\"83\" height=\"46\" rx=\"8\" stroke=\"#0d9488\" fill=\"#0d9488\" fill-opacity=\".1\" /><text x=\"284\" y=\"67\" font-size=\"12\" text-anchor=\"middle\" fill=\"currentColor\">ALUOut</text><text x=\"284\" y=\"85\" font-size=\"16\" text-anchor=\"middle\" fill=\"currentColor\" font-weight=\"700\">1012</text><text x=\"188\" y=\"132\" font-size=\"11\" text-anchor=\"middle\" fill=\"currentColor\">ALUOp = 00</text></svg>"} />
-ALUSrcA = 1 ALUSrcB = 10 Next = 2
+สมมติหลัง Fetch ค่า `PC=1004` และ Immediate=`3` CPU ต้องสร้าง Target จาก `1004 + (3×4) = 1016` ก่อน โดยยังไม่เปลี่ยน PC ไปตำแหน่งนี้
 
-ใน State นี้ยังไม่ต้องเปิด MemRead หรือ RegWrite เพราะเพียงคำนวณ Address
-
-ดังนั้นโซน A ทั้งหมดเป็น 0
-
-ส่วนโซน B ใช้
-
-- `ALUSrcA=1` เพื่ออ่านค่า Base Register
-- `ALUSrcB=10` เพื่อเลือก Offset
-- `ALUOp=00` เพื่อบวก
-- `Next=2` เพื่อไปทำ Memory Access
-
-พอ State 2 จึงนำ ALUOut ไปอ่าน Memory
-
-</section>
-
-<section className="lesson-section" id="ch3-section-6">
-
-## 3.6 State 2 ของ `lw`\: ทำไม Control เป็นชุดนี้?
-
-<MathBlock tex={"Reg[rt]\\leftarrow Memory[ALUOut]"} />
-
-Data Flow
-
-<div className="table-scroll">
-
-| Signal | ค่า | เพราะอะไร |
-|--------|--------|--------|
-| IorD | 1 | Address มาจาก ALUOut |
-| MemRead | 1 | ต้องอ่าน Memory |
-| MemToReg | 1 | Write data มาจาก Memory |
-| RegDst | 0 | เขียน rt |
-| RegWrite | 1 | ต้องบันทึกลง Register File |
-| Next | 0 | กลับไป Fetch |
-
+<div className="mc-step-card">
+  <div className="mc-step-heading"><strong>วงจรย่อจากรูปที่ 2 ของข้อสอบ</strong><span>Step 1/2 · State 1</span></div>
+  <div className="mc-step-recap"><code>PC + (Immediate &lt;&lt; 2) → ALUOut</code><span>PC 1004 · Imm &lt;&lt; 2 = 12 · SrcA 0 · SrcB 11 · ALU + · ALUOut 1016</span></div>
+  <div className="mc-data-operation"><small>DATA Operation · โจทย์ให้มาแล้ว</small><code>ALUOut ← PC + (signext(IR[15:0]) &lt;&lt; 2)</code><span>ตัวอย่าง: ALUOut ← 1004 + 12 = 1016</span></div>
+  <div className="mc-control-zones">
+    <div><h4>1. เลือกทาง</h4><ul><li><code>ALUSrcA = 0</code> เลือก PC</li><li><code>ALUSrcB = 11</code> เลือก Immediate ที่ Shift left 2</li><li><code>ALUOp = 00</code> บวกเพื่อสร้าง Target</li></ul></div>
+    <div><h4>2. เปิดใช้งาน</h4><p>ไม่มีสัญญาณที่ต้องเปิดเพิ่ม ยังไม่เขียน Memory, Register File หรือ PC ผล ALU ถูกเก็บใน ALUOut ของวงจรตาม Clock</p></div>
+  </div>
+  <p className="mc-step-note">ยังไม่เปิด PCWrite เพราะต้องตรวจความเท่ากันก่อน</p>
+  <div className="mc-step-footer">ผล: ALUOut = 1016 <span>Next State 2</span></div>
 </div>
 
-นี่คือวิธีทำที่ต้องใช้กับคำสั่งอื่น ๆ เช่นกัน เริ่มจาก Data Flow แล้วจึงแปลงเป็น Control
+### Step 2/2: ตรวจ Zero แล้ว Branch
 
-</section>
+**State 2 → Next State 0**
 
-<section className="lesson-section" id="ch3-section-7">
+สมมติ `Reg[rs]=7` และ `Reg[rt]=7` เราสั่ง ALU ให้ลบ `7−7` ได้ `Zero=1` จึงใช้ `PCWriteCond` อนุญาตให้ PC รับ Branch Target=`1016` จาก ALUOut ของ Step 1
 
-## 3.7 เปรียบเทียบคำสั่งที่เหลือ
-
-### `sw`\: เหมือน `lw` ตรงไหน?
-
-State 1 ของ `sw` เหมือน `lw` เพราะต้องคำนวณ Address ด้วย Base Register + Offset
-
-<MathBlock tex={"ALUOut=Reg[rs]+SignExt(Immediate)"} />
-
-แต่ State 2 ไม่ได้อ่าน Memory มาลง Register แต่ทำตรงข้าม
-
-<MathBlock tex={"Memory[ALUOut]\\leftarrow Reg[rt]"} />
-
-ดังนั้นเปิด `MemWrite=1`, `IorD=1` และไม่เปิด RegWrite
-
-### R-type: ทำไมต้องใช้ Funct?
-
-เช่น
-
-```mips
-add $t0,$t1,$t2
-```
-
-State 1 เลือกค่าจาก Register สองตัวเข้ามาคำนวณ แล้วเก็บผลใน ALUOut
-
-<MathBlock tex={"ALUOut=Reg[rs]\\ op\\ Reg[rt]"} />
-
-จึงตั้ง `ALUSrcA=1`, `ALUSrcB=00`, `ALUOp=10` เพื่อให้ Funct เลือก Operation จริง
-
-State 2 จึงเขียนผลลง `rd`
-
-`RegWrite=1`, `RegDst=1`, `MemToReg=0`
-
-### `beq`\: ทำไมใช้ ALU สองครั้ง?
-
-State 1 ใช้ ALU คำนวณ Branch Target
-
-<MathBlock tex={"ALUOut=PC+(SignExt(offset)\\ll2)"} />
-
-เลือก `ALUSrcA=0`, `ALUSrcB=11`, `ALUOp=00`
-
-State 2 ใช้ ALU ลบ Register สองตัวเพื่อเปรียบเทียบ
-
-<MathBlock tex={"Reg[rs]-Reg[rt]"} />
-
-ถ้าผลเป็นศูนย์ ALU จะให้ `Zero=1` และอนุญาตให้อัปเดต PC ไป Target ที่เก็บอยู่ใน ALUOut
-
-จึงใช้ `PCWriteCond=1` กับ `PCSource=01`
-
-**State 1**
-
-คำนวณ Branch Target → ALUOut
-
-**State 2**
-
-rs − rt → Zero?
-
-**Zero = 1**
-
-PC ← ALUOut
-
-**Zero = 0**
-
-ใช้ PC+4 เดิม
-
-### `j`\: ทำไมไม่มี State 2?
-
-Jump ไม่ต้องอ่านหรือเขียนข้อมูลจาก Register File
-
-หลังจาก State 0 Fetch คำสั่งแล้ว State 1 สามารถประกอบ Jump Address และเขียน PC ใหม่ได้เลย
-
-<MathBlock tex={"PC\\leftarrow\\{PC[31:28],IR[25:0],00\\}"} />
-
-ดังนั้น `PCWrite=1`, `PCSource=10`, `Next=0`
-
-</section>
-
-<section className="lesson-section" id="ch3-section-8">
-
-## 3.8 ทดลองครบทั้งห้าคำสั่ง
-
-<StateExplorer client:load referenceLayout />
-
-</section>
-
-<section className="lesson-section" id="ch3-section-9">
-
-## 3.9 เฉลยตารางที่ 3–4 ครบ
-
-ตารางที่ 3 ให้เติมขั้นตอนทำงาน ส่วนตารางที่ 4 ให้แปลงขั้นตอนเหล่านั้นเป็น Main Control
-
-<div className="table-scroll">
-
-| คำสั่ง | State 1 | State 2 |
-|--------|--------|--------|
-| j | Jump ไป Target | ไม่มี |
-| beq | คำนวณ Branch Target | SUB ตรวจ Zero และอาจเปลี่ยน PC |
-| R-type | ALU คำนวณ | เขียนผลลง rd |
-| lw | คำนวณ Address | อ่าน Memory แล้วเขียน rt |
-| sw | คำนวณ Address | เขียน rt ลง Memory |
-
+<div className="mc-step-card">
+  <div className="mc-step-heading"><strong>วงจรย่อจากรูปที่ 2 ของข้อสอบ</strong><span>Step 2/2 · State 2</span></div>
+  <div className="mc-step-recap"><code>ALU ตรวจ Zero / ALUOut ส่ง Branch Target ไป PC</code><span>Reg[rs] 7 · Reg[rt] 7 · ALU: 7−7=0 · Zero=1 · PCWriteCond · ALUOut 1016 · PCSource 01 · PC 1016</span></div>
+  <div className="mc-data-operation"><small>DATA Operation · โจทย์ให้มาแล้ว</small><code>if (A == B) PC ← ALUOut</code><span>ตัวอย่าง: 7 − 7 = 0 → Zero=1 → PC ← 1016</span></div>
+  <div className="mc-control-zones">
+    <div><h4>1. เลือกทาง</h4><ul><li><code>ALUSrcA = 1</code> เลือก Register ตัวแรก</li><li><code>ALUSrcB = 00</code> เลือก Register ตัวที่สอง</li><li><code>ALUOp = 01</code> ลบเพื่อตรวจว่าเท่ากัน</li><li><code>PCSource = 01</code> เลือก Branch Target จาก ALUOut</li></ul></div>
+    <div><h4>2. เปิดใช้งาน</h4><ul><li><code>PCWriteCond = 1</code> เขียน PC เฉพาะเมื่อ Zero=1</li></ul></div>
+  </div>
+  <p className="mc-step-note">ผลลบของ ALU ใช้ตรวจ Zero ส่วน Address ที่จะ Branch มาจาก ALUOut ไม่ใช่ผลลบนั้น</p>
+  <div className="mc-step-footer">จบบท 5: beq • Branch if Equal <span>บทถัดไป: j • Jump</span></div>
 </div>
 
-คำอธิบายที่หายไปสำหรับ `sw` State 2 คือ
+</section>
 
-<MathBlock tex={"\\boxed{Mem[ALUOut]\\leftarrow Reg[IR[20:16]]}"} />
+<section className="lesson-section" id="ch3-jump">
 
-**ตารางที่ 4 โซน A**
+## บท 6/6: เปลี่ยน PC โดยไม่มีเงื่อนไข
 
-<div className="table-scroll">
+### `j` • Jump
 
-| State / คำสั่ง | PCWrite | PCWriteCond | MemWrite | MemRead | IRWrite | RegWrite |
-|--------|--------|--------|--------|--------|--------|--------|
-| 0 ทุกคำสั่ง | 1 | 0 | 0 | 1 | 1 | 0 |
-| 1 j | 1 | 0 | 0 | 0 | 0 | 0 |
-| 1 beq | 0 | 0 | 0 | 0 | 0 | 0 |
-| 1 R-type | 0 | 0 | 0 | 0 | 0 | 0 |
-| 1 lw | 0 | 0 | 0 | 0 | 0 | 0 |
-| 1 sw | 0 | 0 | 0 | 0 | 0 | 0 |
-| 2 beq | 0 | 1 | 0 | 0 | 0 | 0 |
-| 2 R-type | 0 | 0 | 0 | 0 | 0 | 1 |
-| 2 lw | 0 | 0 | 0 | 1 | 0 | 1 |
-| 2 sw | 0 | 0 | 1 | 0 | 0 | 0 |
+**เป้าหมาย:** `PC ← Jump Address`
 
+### Step 1/1: สร้าง Jump Address แล้วเขียน PC
+
+**State 1 → Next State 0**
+
+Jump ไม่ต้องเปรียบเทียบ Register และไม่ต้องใช้ ALU คำนวณ Target ในรูปนี้ CPU นำ `IR[25:0]` Shift left 2 แล้วประกอบกับ `PC[31:28]` ก่อนเลือก Jump Address ไปเขียน PC
+
+<div className="mc-step-card">
+  <div className="mc-step-heading"><strong>วงจรย่อจากรูปที่ 2 ของข้อสอบ</strong><span>Step 1/1 · State 1</span></div>
+  <div className="mc-step-recap"><code>PC[31:28] + IR[25:0] + 00 → Jump Address → PC</code><span>IR[25:0] 26 bits · PC[31:28] 4 bits · Shift left 2 · Join bits · PCSource 10</span></div>
+  <div className="mc-data-operation"><small>DATA Operation · โจทย์ให้มาแล้ว</small><code>{'PC ← {PC[31:28], IR[25:0], 00}'}</code><span>Jump เสร็จใน State 1 แล้วกลับ State 0 ทันที</span></div>
+  <div className="mc-control-zones">
+    <div><h4>1. เลือกทาง</h4><ul><li><code>PCSource = 10</code> เลือกช่อง 2 ซึ่งเป็น Jump Address</li></ul></div>
+    <div><h4>2. เปิดใช้งาน</h4><ul><li><code>PCWrite = 1</code> อนุญาตให้เปลี่ยน PC</li></ul></div>
+  </div>
+  <p className="mc-step-note">j ไม่มี State 2 เพราะเปลี่ยน PC ได้ตั้งแต่ State 1</p>
+  <div className="mc-step-footer">จบบท 6: j • Jump <span>ครบทุกคำสั่งแล้ว ต่อไปนำ CONTROL ไปกรอกตารางที่ 4</span></div>
 </div>
 
-**ตารางที่ 4 โซน B**
+</section>
+
+<section className="lesson-section" id="ch3-summary">
+
+## สรุปข้อสอบ: กรอกตารางที่ 3 และ 4
+
+เมื่อทำครบทั้ง 6 บทแล้ว ให้ดึงค่า CONTROL จากสองโซนในแต่ละ Step มาใส่ตารางที่ 4 ตาม Opcode และ State
+
+### ตารางที่ 3: DATA ที่ต้องเติม
+
+สำหรับ `sw` ใน Step 2 โจทย์เว้น DATA Operation ไว้ ให้ตอบว่า:
+
+<div className="mc-summary-data"><small>Store Word • State 2</small><code>Mem[ALUOut] ← Reg[IR[20:16]]</code><span>CONTROL: IorD=1, MemWrite=1</span></div>
+
+### ตารางที่ 4: Main Control
+
+ตารางนี้แสดงเฉพาะ Signal ที่มีค่าไม่เป็นศูนย์ ช่องอื่นให้กรอก `0` หรือ `00` ตามขนาด Signal ตามข้อกำหนดในโจทย์
 
 <div className="table-scroll">
 
-| State / คำสั่ง | PCSource | IorD | MemToReg | RegDst | ALUOp | ALUSrcA | ALUSrcB | Next |
-|--------|--------|--------|--------|--------|--------|--------|--------|--------|
-| 0 ทุกคำสั่ง | 00 | 0 | 0 | 0 | 00 | 0 | 01 | 1 |
-| 1 j | 10 | 0 | 0 | 0 | 00 | 0 | 00 | 0 |
-| 1 beq | 00 | 0 | 0 | 0 | 00 | 0 | 11 | 2 |
-| 1 R-type | 00 | 0 | 0 | 0 | 10 | 1 | 00 | 2 |
-| 1 lw | 00 | 0 | 0 | 0 | 00 | 1 | 10 | 2 |
-| 1 sw | 00 | 0 | 0 | 0 | 00 | 1 | 10 | 2 |
-| 2 beq | 01 | 0 | 0 | 0 | 01 | 1 | 00 | 0 |
-| 2 R-type | 00 | 0 | 0 | 1 | 00 | 0 | 00 | 0 |
-| 2 lw | 00 | 1 | 1 | 0 | 00 | 0 | 00 | 0 |
-| 2 sw | 00 | 1 | 0 | 0 | 00 | 0 | 00 | 0 |
+| State | Opcode / คำสั่ง | โซน 1: เลือกทาง | โซน 2: เปิดใช้งาน | Next |
+|---:|---|---|---|---:|
+| 0 | `xxxxxx` | `ALUSrcB=01` | `PCWrite=1, MemRead=1, IRWrite=1` | 1 |
+| 1 | `000000` R-type | `ALUSrcA=1, ALUOp=10` | ไม่มี | 2 |
+| 1 | `000010` j | `PCSource=10` | `PCWrite=1` | 0 |
+| 1 | `000100` beq | `ALUSrcB=11` | ไม่มี | 2 |
+| 1 | `100011` lw | `ALUSrcA=1, ALUSrcB=10` | ไม่มี | 2 |
+| 1 | `101011` sw | `ALUSrcA=1, ALUSrcB=10` | ไม่มี | 2 |
+| 2 | `000000` R-type | `RegDst=1` | `RegWrite=1` | 0 |
+| 2 | `000100` beq | `ALUSrcA=1, ALUOp=01, PCSource=01` | `PCWriteCond=1` | 0 |
+| 2 | `100011` lw | `IorD=1, MemtoReg=1` | `MemRead=1, RegWrite=1` | 0 |
+| 2 | `101011` sw | `IorD=1` | `MemWrite=1` | 0 |
 
 </div>
 
 Opcode ที่ใช้คือ R-type=`000000`, j=`000010`, beq=`000100`, lw=`100011`, sw=`101011` ส่วน State 0 ใช้ `xxxxxx`
 
+### Mental Model: วิธีคิด CONTROL โดยไม่ต้องท่องตาราง
+
+<div className="course-model" role="group" aria-label="วิธีคิด DATA และ CONTROL">
+  <div><small>DATA</small><strong>ต้องทำอะไร</strong></div>
+  <div><small>เลือกทาง</small><strong>MUX / ALU</strong></div>
+  <div><small>เปิดใช้งาน</small><strong>Read / Write</strong></div>
+  <div><small>ตัวอย่าง `sw`</small><strong>คำนวณ Address → เลือก ALUOut ด้วย IorD=1 → เปิด MemWrite=1</strong></div>
+</div>
+
+หลักสำคัญที่สุดคือ Control โซน 1 กำหนดว่าข้อมูลเดินทางไหน ส่วนโซน 2 กำหนดว่าอุปกรณ์ใดได้รับอนุญาตให้ทำงาน ทั้งสองโซนต้องสัมพันธ์กับ DATA Operation ในแต่ละ Step เสมอ
+
 </section>
 
-<section className="lesson-section" id="ch3-section-10">
+<section className="lesson-section" id="ch3-last-figure">
 
-## 3.10 กลับมาดู Datapath ของโจทย์จริง
+## ทวนภาพ Datapath
 
-<SourceFigure client:load src={`${basePath}/images/q3_datapath.png`} alt="รูปที่ 2 Multicycle Machine" openLabel="เปิดรูปที่ 2 ขนาดเต็ม" aspectRatio="1.975" />
-
-ในภาพ เส้นสีส้มเป็นสาย Control ส่วนเส้นสีดำเป็น Data Paths ลองไล่จาก PC → Memory → IR แล้วค่อยตาม Register File → ALU → ALUOut และเส้นทางกลับไป Memory หรือ Register File
-
-**Mental Model\:** State บอกเวลาที่ต้องทำงาน, โซน A เปิดอุปกรณ์ และโซน B เลือกเส้นทางข้อมูล อย่าท่องตาราง เริ่มจาก Data Flow แล้วหา Control
-
----
+<SourceFigure client:load src={`${basePath}/images/q3_datapath_full.png`} alt="Multicycle Machine จากข้อสอบ FE2019b สำหรับทวนท้ายบท" openLabel="เปิดภาพวงจรขนาดเต็ม" aspectRatio="1.692" />
 
 </section>
 
