@@ -162,13 +162,13 @@ function ZonePanel({ fields, values, name, color }) {
   );
 }
 
-export function StateExplorer() {
+export function StateExplorer({ referenceLayout = false }) {
   const [command, setCommand] = useState('beq');
   const [state, setState] = useState(2);
   const current = getControlState(command, state);
   const commands = [['j', 'j'], ['beq', 'beq'], ['rtype', 'R-type'], ['lw', 'lw'], ['sw', 'sw']];
   return (
-    <div className="simulator">
+    <div className={`simulator${referenceLayout ? ' state-explorer' : ''}`}>
       <SimulatorTitle detail="ตารางที่ 4">Multicycle Control Explorer</SimulatorTitle>
       <div className="step-buttons wrap">
         {commands.map(([id, label]) => <Chip key={id} active={command === id} onClick={() => {
@@ -181,14 +181,16 @@ export function StateExplorer() {
           <Chip key={value} active={state === value} disabled={command === 'j' && value === 2} onClick={() => setState(value)}>State {value}</Chip>
         ))}
       </div>
+      <div className="state-explorer-content">
       <div className="sim-stage">
         <div className="sim-hint">สิ่งที่ CPU ทำใน State นี้ · STATE {current.s} · {current.act}</div>
-        <FlowDiagram nodes={current.flow} />
+        {referenceLayout ? <div className="state-flow" role="img" aria-label={current.flow.join(' ไปยัง ')}>{current.flow.map((node, index) => <div key={index}><span>{node}</span>{index < current.flow.length - 1 && <i aria-hidden="true">↓</i>}</div>)}</div> : <FlowDiagram nodes={current.flow} />}
         <div className="mini-label">{current.why}</div>
       </div>
       <div className="zone-wrap">
         <ZonePanel fields={signalA} values={current.a} name="โซน A: เปิด/ปิด" color="a" />
         <ZonePanel fields={signalB} values={current.b} name="โซน B: เลือกเส้นทาง" color="b" />
+      </div>
       </div>
       <p className="sim-explanation">ช่องที่ไม่ใช้งานใส่ 0 ตามคำสั่งโจทย์</p>
       <button type="button" className="primary-btn" onClick={() => setState(Number(current.b[7]))}>Next State = {current.b[7]}</button>

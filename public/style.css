@@ -117,3 +117,21 @@ body{font-size:calc(17px * var(--font-scale))}
 .alu-explorer .signal-card b,.alu-explorer .signal-card.on b{font-size:20px;color:var(--ink)}
 .alu-explorer .sim-explanation{margin-top:9px!important}
 @media(max-width:720px){.alu-explorer{padding:14px}.alu-explorer .chip{padding:6px 11px}.alu-explorer .signal-card{padding:5px 1px}.alu-explorer .signal-card small{font-size:9px}.alu-explorer .signal-card b{font-size:17px}}
+
+/* Fenced examples share one scrollable surface; inline code keeps its own styling. */
+.reader pre.astro-code{max-width:100%;overflow-x:auto;white-space:pre;background:#20252b!important;color:#f2f4f8;border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:20px 0 24px;line-height:1.8;scrollbar-width:thin}
+.reader pre.astro-code code{display:block;width:max-content;min-width:100%;padding:0;background:transparent;border-radius:0;font-size:14px;line-height:inherit}
+.table-scroll table th,.table-scroll table td{padding-right:16px}
+.table-scroll table th:last-child,.table-scroll table td:last-child{padding-right:0}
+.state-explorer .state-explorer-content{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:14px;align-items:start;margin:14px 0}
+.state-explorer .state-explorer-content .sim-stage,.state-explorer .state-explorer-content .zone-wrap{margin:0}
+.state-flow{display:grid;gap:2px;text-align:center;margin:12px 0}
+.state-flow>div{display:grid;justify-items:center;gap:2px}
+.state-flow span{display:block;width:100%;border:1px solid var(--blue);border-radius:8px;padding:7px 8px;font-size:14px;font-weight:600;line-height:1.4;overflow-wrap:anywhere}
+.state-flow>div:not(:first-child) span{border-color:var(--teal)}
+.state-flow i{font-style:normal;color:var(--blue);line-height:1.1}
+.state-explorer .state-explorer-content .zone-wrap{gap:8px}
+.state-explorer .state-explorer-content .zone{padding:12px}
+.state-explorer .state-explorer-content .zone-row{padding:5px 0}
+@media(max-width:720px){.reader pre.astro-code{padding:14px 16px}.reader pre.astro-code::after{content:'เลื่อนเพื่อดูโค้ดที่ยาว';display:block;position:sticky;left:0;width:max-content;margin-top:10px;color:#b8c2cc;font:12px 'IBM Plex Sans Thai',sans-serif}.state-explorer .state-explorer-content{grid-template-columns:1fr}.state-explorer .state-explorer-content .zone-wrap{grid-template-columns:1fr 1fr}}
+@media(max-width:400px){.state-explorer .state-explorer-content .zone-wrap{grid-template-columns:1fr}}
