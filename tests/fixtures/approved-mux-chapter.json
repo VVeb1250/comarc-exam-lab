@@ -17,5 +17,20 @@
     "2. MUX คืออะไร ทำไมต้องเลือก?",
     "3. อ่าน MUX ในภาพข้อสอบจริง",
     "4. ก่อนเลือก MUX ต้องอ่าน Instruction เป็น"
-  ]
+  ],
+  "sourceUi": {
+    "cards": 11,
+    "datapathDiagrams": 11,
+    "stepPanels": 10,
+    "sections": [
+      "ch3-start",
+      "ch3-fetch",
+      "ch3-sw",
+      "ch3-lw",
+      "ch3-rtype",
+      "ch3-beq",
+      "ch3-jump",
+      "ch3-summary"
+    ]
+  }
 }

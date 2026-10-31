@@ -76,10 +76,11 @@ test('lesson illustrations keep the reference layouts across all six chapters', 
     '3. อ่าน MUX ในภาพข้อสอบจริง',
     '4. ก่อนเลือก MUX ต้องอ่าน Instruction เป็น',
   ]);
-  await expect(page.locator('.mc-step-card')).toHaveCount(10);
-  await expect(page.locator('.mc-control-zones')).toHaveCount(10);
-  await expect(page.locator('#ch3-fetch .mc-path-pair > div')).toHaveCount(2);
-  await expect(page.locator('#ch3-summary tbody tr')).toHaveCount(10);
+  await expect(page.locator('.mux-reference-content .dil-root')).toHaveCount(11);
+  await expect(page.locator('.mux-reference-content .dil-root .box[style*="border-radius:16px"]')).toHaveCount(10);
+  await expect(page.locator('.mux-reference-content .dil-root svg[width="100%"]')).toHaveCount(11);
+  await expect(page.locator('#ch3-fetch .dil-root svg[width="100%"]')).toHaveCount(2);
+  await expect(page.locator('#ch3-summary .table-wrap tbody tr')).toHaveCount(10);
   await expect(page.locator('#ch3-last-figure .source-figure img')).toHaveAttribute('alt', 'Multicycle Machine จากข้อสอบ FE2019b สำหรับทวนท้ายบท');
 
   await open(page, 'study/4/');
@@ -145,11 +146,19 @@ test('diagrams and controls remain readable in both themes', async ({ page }) =>
   expect(positions.result).toBeLessThan(positions.table);
 });
 
-test('new Multicycle steps and lesson tables fit desktop and mobile', async ({ page }) => {
+test('reference MUX layouts and lesson tables fit desktop and mobile', async ({ page }) => {
   await open(page, 'study/3/');
-  const zones = page.locator('#ch3-sw .mc-control-zones').first();
+  const zones = page.locator('#ch3-sw .dil-root .box[style*="border-radius:16px"] .grid[style*="repeat(2"]').first();
   const desktopColumns = await zones.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length);
   expect(desktopColumns).toBe(2);
+
+  const statePanel = page.locator('#ch3-sw .dil-root .box[style*="border-radius:16px"]').first();
+  await expect(statePanel).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await page.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
+  await expect(statePanel).toHaveCSS('background-color', 'rgb(17, 17, 17)');
+  await page.evaluate(() => { document.documentElement.dataset.theme = 'light'; });
+  const diagram = page.locator('#ch3-sw .dil-root svg[width="100%"]').first();
+  expect(await diagram.evaluate((element) => element.getBoundingClientRect().width)).toBeLessThanOrEqual(600);
 
   const table = page.locator('#ch3-primer .table-scroll').first();
   const desktopSpacing = await table.evaluate((element) => {
@@ -162,6 +171,7 @@ test('new Multicycle steps and lesson tables fit desktop and mobile', async ({ p
   await page.setViewportSize({ width: 390, height: 844 });
   const mobileColumns = await zones.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length);
   expect(mobileColumns).toBe(1);
+  expect(await diagram.evaluate((element) => element.getBoundingClientRect().width)).toBeLessThanOrEqual(600);
   const mobileSpacing = await table.evaluate((element) => {
     const style = getComputedStyle(element);
     const cell = getComputedStyle(element.querySelector('td'));
@@ -234,11 +244,11 @@ test('adder, ALU, multicycle control, shifter, hazards, and pipeline controls re
 
   await open(page, 'study/3/');
   await expect(page.locator('#page .hero-title')).toHaveText(siteData.chapters[2].title);
-  await expect(page.locator('.mc-step-card')).toHaveCount(10);
-  await expect(page.locator('#ch3-sw .mc-data-operation').first()).toContainText('ALUOut ← 200 + 8 = 208');
-  await expect(page.locator('#ch3-lw .mc-control-zones').last()).toContainText('MemRead = 1');
-  await expect(page.locator('#ch3-beq .mc-control-zones').last()).toContainText('PCWriteCond = 1');
-  await expect(page.locator('#ch3-jump .mc-step-note')).toContainText('j ไม่มี State 2');
+  await expect(page.locator('.mux-reference-content .dil-root .box[style*="border-radius:16px"]')).toHaveCount(10);
+  await expect(page.locator('#ch3-sw .dil-root')).toContainText('ALUOut ← 200 + 8 = 208');
+  await expect(page.locator('#ch3-lw .dil-root')).toContainText('MemRead = 1');
+  await expect(page.locator('#ch3-beq .dil-root')).toContainText('PCWriteCond = 1');
+  await expect(page.locator('#ch3-jump .dil-root')).toContainText('กลับ State 0 ทันที');
 
   await open(page, 'study/4/');
   const shifter = page.locator('.simulator').first();

@@ -27,7 +27,7 @@ for (const route of routes) {
       images.filter((image) => !image.complete || image.naturalWidth === 0).map((image) => image.src));
     expect(brokenImages).toEqual([]);
     const tableIssues = await page.locator('#page table').evaluateAll((tables) => tables.flatMap((table, index) => {
-      const wrapper = table.closest('.table-scroll');
+      const wrapper = table.closest('.table-scroll, .table-wrap');
       const cell = table.querySelector('th, td');
       const problems = [];
       if (!wrapper) problems.push(`table ${index + 1} has no scroll frame`);
@@ -51,7 +51,7 @@ for (const route of routes) {
     }));
     expect(dimensions.content, 'page should not scroll horizontally on mobile').toBeLessThanOrEqual(dimensions.viewport);
     const mobileTableIssues = await page.locator('#page table').evaluateAll((tables) => tables.flatMap((table, index) => {
-      const wrapper = table.closest('.table-scroll');
+      const wrapper = table.closest('.table-scroll, .table-wrap');
       const cell = table.querySelector('th, td');
       const problems = [];
       if (!wrapper) problems.push(`table ${index + 1} has no scroll frame`);

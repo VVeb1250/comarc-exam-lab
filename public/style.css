@@ -244,52 +244,47 @@ body{font-size:calc(17px * var(--font-scale))}
 .alu-dont-care{color:var(--secondary);font-size:12px;margin:4px 0 0!important}
 .shifter-explorer .result-bar{margin:14px 0}
 
-/* Keep the six Multicycle lessons in the same reading order at every step. */
-.mc-example-values{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:17px 0}
-.mc-example-values>div:not([aria-hidden]){display:flex;flex-direction:column;gap:3px;min-width:0;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:9px 11px}
-.mc-example-values small,.mc-step-heading span,.mc-data-operation small,.mc-summary-data small{font-size:10px;color:var(--secondary)}
-.mc-example-values strong{font:600 14px 'IBM Plex Mono',monospace}
-.mc-example-values>[aria-hidden]{display:grid;place-items:center;color:var(--blue)}
-.mc-example-result{grid-column:1/-1;text-align:center;background:var(--blue-bg)!important}
-.mc-step-card{margin:18px 0 26px;padding:17px;border:1px solid var(--line);border-radius:13px;background:var(--paper);box-shadow:var(--shadow)}
-.mc-step-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-bottom:11px;border-bottom:1px solid var(--line)}
-.mc-step-heading strong{font-size:13px}
-.mc-step-heading span{font-family:'IBM Plex Mono',monospace}
-.mc-step-recap{display:grid;gap:7px;margin:13px 0;padding:11px 13px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
-.mc-step-recap code{width:auto;max-width:100%;color:var(--blue);overflow-wrap:anywhere}
-.mc-step-recap span{font-size:11px;line-height:1.7;color:var(--secondary);overflow-wrap:anywhere}
-.mc-path-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:13px 0}
-.mc-path-pair>div{display:grid;gap:7px;min-width:0;padding:11px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
-.mc-path-pair strong{font-size:12px}
-.mc-path-pair code{overflow-wrap:anywhere}
-.mc-path-pair small{color:var(--secondary);font-size:10px}
-.mc-data-operation{display:grid;gap:5px;margin:13px 0;padding:12px 14px;border-left:3px solid var(--teal);border-radius:0 9px 9px 0;background:var(--teal-bg)}
-.mc-data-operation code{width:max-content;max-width:100%;overflow-wrap:anywhere;font-size:12px}
-.mc-data-operation span{font-size:11px;line-height:1.7;color:var(--secondary)}
-.mc-control-zones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:13px 0}
-.mc-control-zones>div{min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
-.mc-control-zones h4{margin:0 0 8px;font-size:12px;color:var(--blue)}
-.mc-control-zones ul{margin:0;padding-left:20px}
-.mc-control-zones li,.mc-control-zones p{font-size:11px;line-height:1.8;color:var(--secondary)}
-.mc-control-zones p{margin:0}
-.mc-control-zones code{color:var(--ink)}
-.mc-step-note{margin:11px 0 0!important;color:var(--secondary);font-size:11px;line-height:1.7}
-.mc-step-footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:13px;padding-top:11px;border-top:1px solid var(--line);font-size:11px;font-weight:650;color:var(--teal)}
-.mc-step-footer span{font-weight:500;color:var(--secondary)}
-.mc-summary-data{display:grid;gap:5px;margin:13px 0;padding:13px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
-.mc-summary-data code{width:auto;max-width:100%;overflow-wrap:anywhere;color:var(--teal)}
-.mc-summary-data span{font-size:11px;color:var(--secondary)}
 .archive-details{margin:18px 0;padding:14px 16px;border:1px solid var(--line);border-radius:11px;background:var(--paper)}
 .archive-details[open]{background:var(--surface)}
 .archive-details>summary{cursor:pointer;font-weight:650;color:var(--blue)}
 .archive-details>summary:focus-visible{outline:3px solid var(--blue);outline-offset:4px;border-radius:3px}
 .archive-details>.lesson-section:first-child{margin-top:22px}
+/* Chapter 3 uses the lesson cards embedded in the approved MUX lesson export. */
+.mux-reference-content .mux-reference-section{margin-bottom:36px}
+.mux-reference-content .dil-root.live{display:block;width:auto;max-width:100%;padding:0;background:transparent;color:var(--ink);font-family:inherit;font-size:16px;line-height:1.625}
+.mux-reference-content .dil-root *{box-sizing:border-box;overflow-wrap:anywhere}
+.mux-reference-content .dil-root p{margin:0}
+.mux-reference-content .dil-root .box{display:flex;flex-direction:column;min-width:0}
+.mux-reference-content .dil-root .box.dir-row{flex-direction:row}
+.mux-reference-content .dil-root .row{display:flex;flex-direction:row;align-items:center;gap:8px;min-width:0}
+.mux-reference-content .dil-root .grid{display:grid;gap:8px}
+.mux-reference-content .dil-root .grid-item{display:flex;flex-direction:column;min-width:0}
+.mux-reference-content .dil-root .grid-item>*{flex:1 1 auto}
+.mux-reference-content .dil-root .title{font-weight:600}
+.mux-reference-content .dil-root .box[style*="border-radius:16px"]{background:var(--paper)!important}
+:root[data-theme="dark"] .mux-reference-content .dil-root .box[style*="border-radius:16px"]{background:var(--surface)!important}
+.mux-reference-content .dil-root .ts-xl{font-size:24px;line-height:1.3}
+.mux-reference-content .dil-root .ts-lg{font-size:18px;line-height:28px}
+.mux-reference-content .dil-root .ts-md{font-size:16px;line-height:26px}
+.mux-reference-content .dil-root .fs-sm{font-size:14px;line-height:20px}
+.mux-reference-content .dil-root .fs-xs{font-size:12px;line-height:16px}
+.mux-reference-content .dil-root .fs-2xs{font-size:11px;line-height:14px}
+.mux-reference-content .dil-root .c-secondary{color:var(--secondary)}
+.mux-reference-content .dil-root .c-info{color:var(--blue)}
+.mux-reference-content .dil-root .c-success{color:var(--teal)}
+.mux-reference-content .dil-root .icon{display:inline-flex;align-items:center;justify-content:center;width:1em;line-height:1;vertical-align:-.125em;flex:none}
+.mux-reference-content .dil-root .icon svg{display:block;flex:none;width:1em;height:1em}
+.mux-reference-content .dil-root .hr{border:0;border-top:1px solid var(--line);margin:4px 0;width:100%}
+.mux-reference-content .dil-root h2.title,.mux-reference-content .dil-root h3.title{margin:0;letter-spacing:normal}
+.mux-reference-content .dil-root h2.title.ts-lg{font-size:18px;line-height:28px}
+.mux-reference-content .dil-root h3.title.ts-md{font-size:16px;line-height:26px}
+.mux-reference-content .dil-root svg[width="100%"]{display:block;width:100%;max-width:600px!important;height:auto;margin-inline:auto}
+.mux-reference-content .table-wrap{max-width:100%;overflow-x:auto;margin:24px 0 30px;border:1px solid var(--line);border-radius:10px;scrollbar-width:thin}
+.mux-reference-content .table-wrap table{width:100%;min-width:740px;margin:0;border-collapse:collapse;font-size:12px;line-height:1.6}
+.mux-reference-content .table-wrap th,.mux-reference-content .table-wrap td{padding:14px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.mux-reference-content .table-wrap th{background:var(--surface);color:var(--secondary);font-size:11px;white-space:nowrap}
+.mux-reference-content .table-wrap tr:last-child td{border-bottom:0}
 @media(max-width:720px){
-  .mc-path-pair,.mc-control-zones{grid-template-columns:1fr}
-  .mc-step-card{padding:13px}
-  .mc-step-heading{align-items:flex-start}
-  .mc-example-values{gap:4px}
-  .mc-example-values>div:not([aria-hidden]){padding:8px 5px}
-  .mc-example-values small{font-size:9px}
-  .mc-example-values strong{font-size:12px}
+  .mux-reference-content .dil-root .grid[style*="repeat(2"]{grid-template-columns:1fr!important}
+  .mux-reference-content .dil-root .grid[style*="repeat(3"]{grid-template-columns:1fr!important}
 }

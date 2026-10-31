@@ -56,6 +56,16 @@ describe('preserved lesson editions', () => {
     for (const heading of muxChapter.requiredHeadings) expect(mdx).toContain(heading);
     expect([...mdx.matchAll(/\/images\/q3_datapath_full\.png/g)]).toHaveLength(2);
 
+    const ui = readFileSync(fileURLToPath(new URL('../../src/content/chapters/03-reference-ui.html', import.meta.url)), 'utf8');
+    expect([...ui.matchAll(/<section id="(ch3-[^"]+)" class="lesson-section mux-reference-section">/g)].map((match) => match[1]))
+      .toEqual(muxChapter.sourceUi.sections);
+    expect([...ui.matchAll(/<div class="dil-root live">/g)]).toHaveLength(muxChapter.sourceUi.cards);
+    expect([...ui.matchAll(/<svg\b(?=[^>]*\bviewbox="0 0 360 163")(?=[^>]*\bwidth="100%")[^>]*>/g)])
+      .toHaveLength(muxChapter.sourceUi.datapathDiagrams);
+    expect([...ui.matchAll(/<div class="box" style="[^"]*border-radius:16px[^"]*">/g)])
+      .toHaveLength(muxChapter.sourceUi.stepPanels);
+    expect(ui).not.toMatch(/<script\b|<style\b|<form\b/i);
+
     const archivePath = fileURLToPath(new URL('../../src/archive/chapter-03-previous.mdx', import.meta.url));
     const archive = readFileSync(archivePath, 'utf8');
     expect(chapterInfo(archive).title).toBe('ข้อ 3: Multicycle Datapath');
