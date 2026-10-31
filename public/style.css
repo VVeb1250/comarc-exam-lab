@@ -138,6 +138,101 @@ body{font-size:calc(17px * var(--font-scale))}
 
 /* Keep diagrams readable without letting previews dominate the lesson. */
 .inline-diagram .diagram-svg{max-width:460px;margin-inline:auto}
+
+/* Compact MIPS fields, worked examples, and end-of-course checks. */
+.instruction-path,.memory-level-flow{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;margin:16px 0}
+.instruction-path>div,.memory-level-flow>div{display:flex;flex-direction:column;gap:5px;min-width:0;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:12px}
+.instruction-path small,.memory-level-flow small{font-size:10px;color:var(--secondary)}
+.instruction-path strong,.memory-level-flow strong{font-size:12px;line-height:1.5}
+.instruction-path code{background:transparent;padding:0;font-size:10px;overflow-wrap:anywhere}
+.instruction-path>span,.memory-level-flow>span{color:var(--blue);font-size:17px}
+.memory-level-flow span{font-size:11px;line-height:1.5;color:var(--secondary)}
+.instruction-example{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:10px 12px;margin:12px 0}
+.instruction-example>span,.instruction-address-map small,.extension-example small{font-size:11px;color:var(--secondary)}
+.instruction-example code{overflow-wrap:anywhere}
+.instruction-format-explorer .instruction-fields{width:100%;gap:5px;margin:12px 0 14px}
+.instruction-format-explorer .instruction-field{min-width:0;overflow-wrap:anywhere;padding:10px 3px}
+.instruction-format-explorer .instruction-field small{font-size:8px;line-height:1.35}
+.instruction-format-explorer .instruction-field b{font-size:11px}
+.instruction-format-explorer .instruction-field code{background:transparent;padding:0;color:var(--ink);font:500 clamp(8px,.9vw,10px)/1.5 'IBM Plex Mono',monospace;letter-spacing:-.35px;overflow-wrap:anywhere}
+.instruction-format-explorer .field-control{background:var(--blue-bg);border-color:var(--line)}
+.instruction-format-explorer .field-register{background:var(--teal-bg);border-color:var(--line)}
+.instruction-format-explorer .field-value{background:var(--amber-bg);border-color:var(--line)}
+.instruction-address-map{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:17px 0 10px}
+.address-word{min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--paper);padding:11px}
+.address-word small{display:block;margin-bottom:8px}
+.address-bytes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.address-bytes code{min-width:0;text-align:center;font-size:clamp(8px,1vw,10px);padding:5px 1px;overflow-wrap:anywhere}
+.pc-step{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding:11px;color:var(--secondary);font-size:12px}
+.pc-step code{color:var(--blue);font-size:12px}
+.extension-example{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.4fr);align-items:center;gap:10px;margin:16px 0}
+.extension-example>div{min-width:0;display:flex;flex-direction:column;gap:7px;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:11px}
+.extension-example code{white-space:normal;overflow-wrap:anywhere;font-size:clamp(9px,1vw,11px);line-height:1.7}
+.slt-overflow-cases>div{min-width:0}
+.slt-overflow-cases code{white-space:normal;overflow-wrap:anywhere}
+.slt-overflow-cases strong{color:var(--teal);font-size:12px;line-height:1.7}
+.branch-offset-card{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:13px;margin:16px 0}
+.branch-offset-card>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.branch-offset-card small{font-size:10px;color:var(--secondary)}
+.branch-offset-card code{width:max-content;max-width:100%;overflow-wrap:anywhere}
+.branch-offset-card>strong{grid-column:1/-1;border-top:1px solid var(--line);padding-top:10px;font-size:12px;line-height:1.7}
+.branch-offset-card>strong span{display:block;color:var(--secondary);font-weight:500}
+.variation-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:16px 0}
+.variation-grid>div{display:flex;flex-direction:column;gap:7px;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:13px}
+.variation-grid b{font-size:12px;color:var(--blue)}
+.variation-grid span{font-size:12px;line-height:1.7;color:var(--secondary)}
+.stall-action-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:16px 0}
+.stall-action-grid>div{display:flex;flex-direction:column;gap:4px;min-width:0;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:12px}
+.stall-action-grid small{font:500 10px 'IBM Plex Mono',monospace;color:var(--secondary)}
+.stall-action-grid strong{color:var(--blue);font:600 13px 'IBM Plex Mono',monospace}
+.stall-action-grid span{font-size:11px;line-height:1.6;color:var(--secondary)}
+.transfer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:19px 0 28px}
+.transfer-card{min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--paper);padding:13px 15px;transition:border-color .15s,background .15s}
+.transfer-card[open]{background:var(--surface);border-color:var(--blue)}
+.transfer-card summary{display:flex;align-items:flex-start;gap:10px;cursor:pointer;list-style:none;font-size:13px;font-weight:650;line-height:1.7}
+.transfer-card summary::-webkit-details-marker{display:none}
+.transfer-card summary::after{content:'+';margin-left:auto;color:var(--blue);font:600 17px/1.3 'IBM Plex Mono',monospace}
+.transfer-card[open] summary::after{content:'−'}
+.transfer-card summary:focus-visible{outline:3px solid var(--blue);outline-offset:4px;border-radius:3px}
+.transfer-number{flex:0 0 auto;color:var(--blue);font:600 11px 'IBM Plex Mono',monospace;padding-top:3px}
+.transfer-answer{border-top:1px solid var(--line);margin-top:11px;padding-top:7px;font-size:12px;line-height:1.8}
+.transfer-answer p{margin:8px 0!important}
+.transfer-answer p:first-child{color:var(--teal)}
+.exam-coverage-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:17px 0}
+.exam-coverage-grid>div{display:flex;flex-direction:column;gap:4px;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:12px}
+.exam-coverage-grid small{font:600 10px 'IBM Plex Mono',monospace;color:var(--blue)}
+.exam-coverage-grid strong{font-size:12px;line-height:1.5}
+.exam-coverage-grid span{font-size:11px;line-height:1.6;color:var(--secondary)}
+.course-model{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:18px 0}
+.course-model>div{display:flex;flex-direction:column;gap:5px;min-width:0;border:1px solid var(--line);border-top:2px solid var(--blue);border-radius:9px;background:var(--surface);padding:12px}
+.course-model>div:nth-child(2){border-top-color:var(--teal)}
+.course-model>div:nth-child(3){border-top-color:var(--amber)}
+.course-model>div:nth-child(4){border-top-color:var(--red)}
+.course-model small{font-size:10px;color:var(--secondary)}
+.course-model strong{font-size:12px}
+.course-model span{font-size:10px;line-height:1.6;color:var(--secondary);overflow-wrap:anywhere}
+@media(max-width:720px){
+  .instruction-path,.memory-level-flow{grid-template-columns:1fr;gap:5px}
+  .instruction-path>span,.memory-level-flow>span{justify-self:center;transform:rotate(90deg);line-height:1}
+  .instruction-address-map{grid-template-columns:1fr}
+  .extension-example{grid-template-columns:1fr;gap:5px}
+  .extension-example>span{justify-self:center;transform:rotate(90deg)}
+  .branch-offset-card{gap:7px;padding:10px}
+  .branch-offset-card small{font-size:9px}
+  .branch-offset-card code{font-size:10px}
+  .variation-grid,.transfer-grid{grid-template-columns:1fr}
+  .stall-action-grid{gap:5px}
+  .stall-action-grid>div{padding:9px 7px}
+  .exam-coverage-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .course-model{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:390px){
+  .exam-coverage-grid{grid-template-columns:1fr}
+  .transfer-card{padding:12px}
+  .instruction-format-explorer .instruction-fields{gap:2px}
+  .instruction-format-explorer .instruction-field{padding:8px 1px}
+  .instruction-format-explorer .instruction-field small{font-size:7px}
+}
 .source-figure{max-width:680px;margin-inline:auto}
 .source-figure .source-figure-link{aspect-ratio:auto}
 .source-figure.loaded img{width:auto;height:auto;max-width:100%;max-height:480px;margin-inline:auto;object-fit:contain}

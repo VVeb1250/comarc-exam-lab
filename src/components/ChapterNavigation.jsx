@@ -19,6 +19,10 @@ export function ChapterNavigation({ mode, chapter, basePath }) {
         </a>
       ))}
       <div className="nav-separator" />
+      <a href={`${basePath}/study/bonus/`} className={`chapter-link ${mode === 'bonus' ? 'active' : ''}`}>
+        <span className="chapter-number">＋</span><span className="chapter-info"><strong>เสริมกันเหนียว</strong><small>พื้นฐานและโจทย์ประยุกต์</small></span>
+      </a>
+      <div className="nav-separator" />
       <a href={`${basePath}/`} className={`chapter-link ${mode === 'library' ? 'active' : ''}`}>
         <span className="chapter-number">⌂</span><span className="chapter-info"><strong>Exam Library</strong><small>รายการบทเรียน</small></span>
       </a>

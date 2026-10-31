@@ -1,0 +1,13 @@
+---
+import BonusContent, { bonusInfo } from '../../content/bonus.mdx';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+---
+<SiteLayout
+  title={`${bonusInfo.title} · ComArc Exam Lab`}
+  currentLabel={bonusInfo.title}
+  mode="bonus"
+  chapter={0}
+  sections={bonusInfo.sections}
+>
+  <BonusContent />
+</SiteLayout>

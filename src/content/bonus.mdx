@@ -1,0 +1,250 @@
+import InstructionFormatExplorer from '../components/InstructionFormatExplorer.jsx';
+import MathBlock from '../components/MathBlock.jsx';
+
+export const bonusInfo = {
+  title: 'ส่วนเสริมกันเหนียว',
+  sections: [
+    { id: 'bonus-start', title: 'วิธีใช้หน้านี้' },
+    { id: 'bonus-instruction-format', title: 'Instruction และ Machine Code' },
+    { id: 'bonus-slt-overflow', title: 'SLT เมื่อเกิด Overflow' },
+    { id: 'bonus-branch-address', title: 'หา Branch Offset และ Jump Address' },
+    { id: 'bonus-srl', title: 'SRL และหมายเหตุจากสไลด์' },
+    { id: 'bonus-pipeline', title: 'Pipeline, Stall และ Memory' },
+    { id: 'bonus-stall-control', title: 'Hold และ Bubble' },
+    { id: 'bonus-transfer', title: 'โจทย์พลิกและเช็กขอบเขต' },
+  ],
+};
+
+<h1 className="hero-title">ส่วนเสริมกันเหนียว</h1>
+
+ทบทวนพื้นฐานและลองโจทย์ที่พลิกจากตัวอย่างหลัก
+
+<section className="lesson-section" id="bonus-start">
+
+## หน้านี้ต่อจากข้อ 1–6
+
+หน้านี้รวบรวมพื้นฐานและตัวอย่างเพิ่มเติมที่ใช้ช่วยทำความเข้าใจข้อสอบ FE2019b ข้อ 1–6 เนื้อหาในข้อสอบหลักยังอยู่หน้าเดิมทั้งหมด และหน้านี้ไม่นับเป็นข้อ 7
+
+ใช้ทบทวนส่วนที่ยังไม่คล่อง หรือเปิดดูเมื่อโจทย์เปลี่ยนตัวเลขและคำสั่ง
+
+</section>
+
+<section className="lesson-section" id="bonus-instruction-format">
+
+## CPU แปลง Assembly เป็นสัญญาณควบคุมอย่างไร?
+
+มนุษย์อ่าน `lw $t0, 12($s1)` ได้ แต่ CPU อ่านข้อความ `lw` หรือชื่อ `$s1` โดยตรงไม่ได้ คำสั่งถูกเก็บใน Memory เป็น Machine Code 32-bit แล้ว Instruction Decoder จึงแยก Field เพื่อเลือก Control Signals และเส้นทางข้อมูล
+
+<div className="instruction-path" role="img" aria-label="Assembly ถูกเข้ารหัสเป็น Machine Code แล้ว Instruction Decoder สร้าง Control Signals">
+  <div><small>มนุษย์เขียน</small><strong>Assembly</strong><code>lw $t0, 12($s1)</code></div>
+  <span aria-hidden="true">→</span>
+  <div><small>Memory เก็บ</small><strong>Machine Code</strong><code>32-bit</code></div>
+  <span aria-hidden="true">→</span>
+  <div><small>CPU แยก Field</small><strong>Instruction Decoder</strong><code>Opcode · rs · rt · Immediate</code></div>
+</div>
+
+### รูปแบบคำสั่ง MIPS
+
+ทั้ง R-type, I-type และ J-type ยาว 32-bit เท่ากัน แต่แบ่ง Field คนละแบบ เลือกตัวอย่างเพื่อดูตำแหน่งของ Field
+
+<InstructionFormatExplorer client:load />
+
+ใน `lw $t0, 12($s1)`, `rs=10001` คือ `$s1`, `rt=01000` คือ `$t0` และ Immediate `12` อยู่ใน 16-bit สุดท้าย Register มี 32 ตัวจึงใช้ Field 5-bit ระบุหมายเลขได้ครบ 0–31 ส่วน `rt` ของ `sw` เป็น Register ต้นทางที่นำข้อมูลไปเก็บใน Memory
+
+### Address ของ Memory และ PC+4
+
+Memory แบบ byte-addressed ให้ Address หนึ่งตำแหน่งต่อข้อมูล 1 byte (8-bit) ส่วน MIPS Instruction ใช้ 32-bit หรือ 4 bytes จึงเริ่มคำสั่งถัดไปห่างออกไป 4 Address
+
+<div className="instruction-address-map" role="img" aria-label="แต่ละ MIPS instruction ใช้ 4 byte addresses และ PC เพิ่มครั้งละ 4">
+  <div className="address-word">
+    <small>Instruction · 4 bytes</small>
+    <div className="address-bytes"><code>0x1000</code><code>0x1001</code><code>0x1002</code><code>0x1003</code></div>
+  </div>
+  <div className="address-word">
+    <small>Instruction ถัดไป · 4 bytes</small>
+    <div className="address-bytes"><code>0x1004</code><code>0x1005</code><code>0x1006</code><code>0x1007</code></div>
+  </div>
+</div>
+
+<div className="pc-step"><span>PC</span><code>0x1000 → 0x1004 → 0x1008</code></div>
+
+### Sign Extension ของ Immediate
+
+I-type มี Immediate 16-bit แต่ ALU ในตัวอย่างทำงานกับข้อมูล 32-bit จึงขยายโดยคัดลอกบิตเครื่องหมาย (บิตซ้ายสุด) ไปทางซ้าย
+
+<div className="extension-example" role="group" aria-label="Sign extension ของเลข -4 จาก 16 บิตเป็น 32 บิต">
+  <div><small>16-bit Immediate · −4</small><code>1111 1111 1111 1100</code></div>
+  <span aria-hidden="true">→</span>
+  <div><small>32-bit Operand · −4</small><code>1111 1111 1111 1111 1111 1111 1111 1100</code></div>
+</div>
+
+ถ้าบิตเครื่องหมายเป็น `0` จะเติม `0` เช่น Immediate `+12` กลายเป็น `0000 0000 0000 0000 0000 0000 0000 1100` ส่วน `lw` และ `sw` ใช้ค่านี้เป็น Offset บวกหรือลบได้ สำหรับ `beq` ให้ Sign-extend ก่อนเลื่อนซ้าย 2 บิตเพื่อหา Branch Target
+
+</section>
+
+<section className="lesson-section" id="bonus-slt-overflow">
+
+## SLT ใช้ Sign กับ Overflow พร้อมกัน
+
+Signed SLT ต้องคำนึงถึง Overflow ของการลบด้วย โดยบิตผลเปรียบเทียบคำนวณจาก `Sign(A−B) XOR Overflow`
+
+<div className="two-paths slt-overflow-cases" aria-label="ตัวอย่าง Signed comparison ที่เกิด Overflow">
+  <div>
+    <b>A=7, B=−8</b>
+    <code>A−B=15 → เก็บ 1111</code>
+    <span>Sign=1, Overflow=1</span>
+    <strong>Set=1 XOR 1=0 · 7 &lt; −8 เป็น False</strong>
+  </div>
+  <div>
+    <b>A=−8, B=7</b>
+    <code>A−B=−15 → เก็บ 0001</code>
+    <span>Sign=0, Overflow=1</span>
+    <strong>Set=0 XOR 1=1 · −8 &lt; 7 เป็น True</strong>
+  </div>
+</div>
+
+ตัวเลขนี้ใช้ 4-bit เพื่อให้เห็น Overflow ชัด ๆ หลักการเดียวกันใช้กับ ALU 32-bit โดยพิจารณา Sign และ Overflow จากผลลบจริง
+
+</section>
+
+<section className="lesson-section" id="bonus-branch-address">
+
+## หา Branch Offset และ Jump Address
+
+`beq` เก็บ Offset เป็นจำนวนคำสั่ง ไม่ใช่จำนวน Byte จึงคูณ 4 ก่อนบวกกับ `PC+4`
+
+<MathBlock tex={"Target=(PC+4)+(SignExt(offset)\\ll2)"} />
+
+ย้อนหา Offset ได้ด้วย `offset = (Target − (PC+4)) / 4` ตัวอย่าง `PC=0x00400020` และ `Target=0x00400014`:
+
+<div className="branch-offset-card" role="group" aria-label="ตัวอย่างการหา Branch Offset">
+  <div><small>PC ของ beq</small><code>0x00400020</code></div>
+  <div><small>PC+4</small><code>0x00400024</code></div>
+  <div><small>Target</small><code>0x00400014</code></div>
+  <strong>Offset = (0x00400014 − 0x00400024) / 4 = −4 <span>· Immediate 16-bit = 0xFFFC</span></strong>
+</div>
+
+ใน Multicycle State 1, Fetch เพิ่ม `PC` เป็น `PC+4` ไปแล้ว วงจรจึงใช้ค่า PC ปัจจุบันบวก `SignExt(offset) << 2` ได้ตามสูตร
+
+สำหรับ `j`, 4 บิตบนของ Jump Address มาจาก `(PC+4)[31:28]` เมื่อเขียนใน State หลัง Fetch ที่ `PC` เพิ่มแล้ว จะเห็นเป็น `PC[31:28]`
+
+### เมื่อโจทย์เปลี่ยน ให้ตาม Data Flow
+
+<div className="variation-grid" aria-label="เปรียบเทียบการเปลี่ยนโจทย์ Multicycle">
+  <div><b>`lw` → `sw`</b><span>State 1 ยังหา Address ด้วย `rs + offset`; State 2 เปลี่ยนจากอ่าน Memory/เขียน Register เป็นเขียน Memory</span></div>
+  <div><b>Offset `12` → `−4`</b><span>Effective Address เปลี่ยน แต่เส้นทาง MUX และ Control ที่ใช้คำนวณ Address เหมือนเดิม</span></div>
+  <div><b>`add` → `sub`</b><span>Funct เปลี่ยนให้ ALU Control เลือก Operation ใหม่ แต่ Main Control ยังให้ `ALUOp=10` สำหรับ R-type</span></div>
+  <div><b>Branch Taken → Not Taken</b><span>คำนวณ Target แยกไว้เหมือนเดิม; เมื่อ `Zero=0` จะคง `PC+4` ไว้</span></div>
+</div>
+
+</section>
+
+<section className="lesson-section" id="bonus-srl">
+
+## SRL เติม 0 ส่วน SRA เติมบิตเครื่องหมาย
+
+สำหรับ `srl` (logical right shift) บิตที่เลื่อนเข้ามาทางซ้ายเป็น `0`; `sra` (arithmetic right shift) จึงคัดลอกบิตเครื่องหมายแทน
+
+<div className="learning-note warn">
+  <strong>หมายเหตุเทียบกับสไลด์ w02b3 หน้า 3</strong>
+  บรรทัดในสไลด์อธิบาย SRL ว่าเติมบิตจาก MSB แต่คำสั่ง MIPS `srl` เติม `0` ทางซ้าย ส่วนการคัดลอกบิตเครื่องหมายเป็น `sra` ข้อนี้ถาม SRL จึงเติม `0` ตาม <a href="https://training.mips.com/basic_mips/PDF/Instruction_Set.pdf" target="_blank" rel="noreferrer">MIPS Instruction Set</a>
+</div>
+
+</section>
+
+<section className="lesson-section" id="bonus-pipeline">
+
+## Pipeline: จำนวน Clock, Stall และ Memory
+
+สำหรับ Pipeline 5 Stages แบบไม่มี Stall, `N` instructions ใช้ `N+4` Clock จน Instruction สุดท้ายเสร็จ ถ้ามี Stall ให้บวก Clock ที่หยุดรอเข้าไป
+
+<MathBlock tex={"\\boxed{Cycles=N+4+StallCycles}"} />
+
+ตัวอย่าง 10 Instructions และมี Load-Use Stall 1 Clock ใช้ `10+4+1=15 Cycles` ถ้า clock rate เท่ากับ `1 GHz` (คาบ `1 ns`) จะใช้เวลา `15 ns`
+
+<div className="memory-level-flow" role="group" aria-label="Memory hierarchy จาก CPU ไป Cache และ Main Memory">
+  <div><small>เร็วที่สุด</small><strong>CPU</strong><span>ทำงานกับข้อมูล</span></div>
+  <span aria-hidden="true">→</span>
+  <div><small>ใกล้ CPU</small><strong>Cache</strong><span>เล็กและเร็วกว่า RAM</span></div>
+  <span aria-hidden="true">→</span>
+  <div><small>ความจุมากกว่า</small><strong>Main Memory</strong><span>ใหญ่กว่าแต่ช้ากว่า</span></div>
+</div>
+
+Cache Hit ช่วยลดเวลารอเข้าถึง Memory แต่ไม่ได้ทำให้ข้อมูลจาก `lw` พร้อมก่อนเวลา Dependency ระหว่าง `lw` กับคำสั่งถัดไปที่ใช้ผลทันทีจึงยังต้อง Stall ตามจังหวะของ Pipeline แล้วค่อย Forward ข้อมูล
+
+</section>
+
+<section className="lesson-section" id="bonus-stall-control">
+
+## Load-Use Stall ค้างอะไร และส่ง Bubble ตรงไหน?
+
+เมื่อ `lw` อยู่ MEM และคำสั่งถัดไปต้องรอข้อมูล Hazard Detection จะหยุดคำสั่งใหม่ชั่วคราวโดยไม่ลบ Control ของ `lw` ที่เดินทางอยู่
+
+<div className="stall-action-grid" role="group" aria-label="การควบคุม Pipeline เมื่อ Stall">
+  <div><small>PC</small><strong>Hold</strong><span>ยังไม่ Fetch คำสั่งใหม่</span></div>
+  <div><small>IF/ID</small><strong>Hold</strong><span>เก็บ Instruction ที่กำลังรอไว้</span></div>
+  <div><small>ID/EX</small><strong>Bubble</strong><span>ส่ง Control ที่ไม่มีผลเข้า EX</span></div>
+</div>
+
+Control ของ `lw` ที่เดินทางอยู่ใน EX/MEM ยังทำงานของมันต่อ ขณะที่ Main Control ใน ID สร้างค่าชุดใหม่สำหรับ Instruction ที่รออยู่
+
+</section>
+
+<section className="lesson-section" id="bonus-transfer">
+
+## ลองทำก่อนเปิดเฉลย
+
+แบบฝึก 6 ข้อนี้เปลี่ยนตัวเลขหรือเงื่อนไขจากตัวอย่างหลัก ลองคิดคำตอบก่อนแล้วค่อยเปิดดูเฉลย
+
+<div className="transfer-grid">
+  <details className="transfer-card">
+    <summary><span className="transfer-number">01</span><span>Signed 4-bit: `1010 + 1011` มี Overflow หรือไม่?</span></summary>
+    <div className="transfer-answer"><p><strong>มี Overflow</strong></p><p>`1010 = −6`, `1011 = −5`, ผลจริงคือ `−11` ซึ่งต่ำกว่าช่วง Signed 4-bit `−8 ถึง 7` วงจรเก็บ 4 บิตได้ `0101` (+5)</p></div>
+  </details>
+  <details className="transfer-card">
+    <summary><span className="transfer-number">02</span><span>SLT เปรียบเทียบ `A=−8`, `B=7` ได้ผลเท่าไร?</span></summary>
+    <div className="transfer-answer"><p><strong>ได้ `1`</strong></p><p>`−8 &lt; 7` เป็นจริง จึงเขียนค่า 1 ลงผลลัพธ์ SLT การลบใน ALU 32-bit ได้ `−15` ซึ่งอยู่ในช่วง จึงไม่มี Overflow</p></div>
+  </details>
+  <details className="transfer-card">
+    <summary><span className="transfer-number">03</span><span>`sw $t2, 12($s0)`, เมื่อ `$s0=2048`, `$t2=91` จะเขียนที่ไหน?</span></summary>
+    <div className="transfer-answer"><p><strong>`Memory[2060] ← 91`</strong></p><p>State 1 คำนวณ Address `2048+12=2060`; State 2 เลือก Address จาก ALUOut (`IorD=1`) แล้วเปิด `MemWrite=1`</p></div>
+  </details>
+  <details className="transfer-card">
+    <summary><span className="transfer-number">04</span><span>`beq` ที่ PC `0x00400020` ไป Target `0x00400014`, Offset เท่าไร?</span></summary>
+    <div className="transfer-answer"><p><strong>Offset = `−4` หรือ 16-bit `0xFFFC`</strong></p><p>`PC+4=0x00400024`; `(0x00400014−0x00400024)/4 = −4`</p></div>
+  </details>
+  <details className="transfer-card">
+    <summary><span className="transfer-number">05</span><span>`lw` ตามด้วย `add` ที่ใช้ผลทันที ใช้ Forwarding อย่างเดียวพอหรือไม่?</span></summary>
+    <div className="transfer-answer"><p><strong>ไม่พอ, ต้อง Stall 1 Clock แล้ว Forward</strong></p><p>ข้อมูลจาก `lw` พร้อมหลัง MEM แต่คำสั่งถัดไปต้องใช้ใน EX ก่อนข้อมูลจะมาทัน</p></div>
+  </details>
+  <details className="transfer-card">
+    <summary><span className="transfer-number">06</span><span>Clock 4: MEM ทำ `lw`, ID กำลัง Decode `sw`, Main Control จะทับกันไหม?</span></summary>
+    <div className="transfer-answer"><p><strong>ไม่ทับกัน</strong></p><p>`lw` ใช้ Control ของตัวเองที่เก็บใน EX/MEM; Main Control ใน ID สร้าง Control สำหรับ `sw` แล้วเก็บไปกับ `sw` ผ่าน Pipeline Registers</p></div>
+  </details>
+</div>
+
+### เนื้อหาหลักทั้ง 6 ข้อครอบคลุมอะไรบ้าง
+
+<div className="exam-coverage-grid" aria-label="หัวข้อบทเรียนที่ครอบคลุมตามข้อสอบ FE2019b">
+  <div><small>ข้อ 1</small><strong>Binary Arithmetic</strong><span>Signed/Unsigned และ Overflow</span></div>
+  <div><small>ข้อ 2</small><strong>ALU Control</strong><span>ALUOp, Funct, Operation และ SLT</span></div>
+  <div><small>ข้อ 3</small><strong>Multicycle Datapath</strong><span>States, MUX และ Control สองโซน</span></div>
+  <div><small>ข้อ 4</small><strong>Barrel Shifter</strong><span>SRL, `shamt` และ Data Path</span></div>
+  <div><small>ข้อ 5</small><strong>Pipeline &amp; Hazards</strong><span>Clock, Forwarding, Stall, Scheduling และ Cache</span></div>
+  <div><small>ข้อ 6</small><strong>Pipeline Control</strong><span>Pipeline Registers และ Hazard Units</span></div>
+</div>
+
+รายการนี้อ้างอิงขอบเขตข้อสอบ FE2019b ฉบับที่ใช้ทำบทเรียน ไม่ได้รับประกันว่าข้อสอบชุดอื่นจะไม่ถามหัวข้อเพิ่มเติม
+
+### Mental Model สำหรับทวนก่อนสอบ
+
+<div className="course-model" role="group" aria-label="Instruction, Control, Datapath และ Time">
+  <div><small>เริ่มจาก</small><strong>Instruction</strong><span>Opcode · Register Fields · Immediate</span></div>
+  <div><small>เลือก</small><strong>Control</strong><span>อุปกรณ์และเส้นทางที่ต้องใช้</span></div>
+  <div><small>ติดตาม</small><strong>Datapath</strong><span>อ่าน · คำนวณ · ส่งต่อ · เขียนกลับ</span></div>
+  <div><small>ตรวจ</small><strong>Time</strong><span>State · Stage · Hazard</span></div>
+</div>
+
+เริ่มจากดูว่า Instruction ต้องทำอะไร แล้วตามข้อมูลผ่าน Datapath และดูว่า Control หรือผลลัพธ์ต้องพร้อมใน State หรือ Stage ใด
+
+</section>
