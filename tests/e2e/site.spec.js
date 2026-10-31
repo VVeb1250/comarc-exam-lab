@@ -53,6 +53,35 @@ test('all six approved study chapters render their headings and source figures',
   await expect(page.getByRole('dialog', { name: 'ขยายภาพ' })).toHaveCount(0);
 });
 
+test('multicycle controls and lesson tables have breathing room on desktop and mobile', async ({ page }) => {
+  await open(page, 'study/3/');
+  const zones = page.locator('#ch3-section-3 .control-zone-wrap');
+  await expect(zones.locator('.zone-a .zone-signal')).toHaveCount(6);
+  await expect(zones.locator('.zone-b .zone-signal')).toHaveCount(8);
+  const zoneSpacing = await zones.locator('.zone-signal-list').first().evaluate((element) => getComputedStyle(element).gap);
+  expect(zoneSpacing).toBe('8px');
+
+  const table = page.locator('.table-scroll').first();
+  const desktopSpacing = await table.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const cell = getComputedStyle(element.querySelector('td'));
+    return { top: parseFloat(style.marginTop), bottom: parseFloat(style.marginBottom), cell: parseFloat(cell.paddingTop) };
+  });
+  expect(desktopSpacing).toEqual({ top: 24, bottom: 30, cell: 14 });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileZoneGap = await zones.locator('.zone-signal-list').first().evaluate((element) => getComputedStyle(element).gap);
+  expect(mobileZoneGap).toBe('8px');
+  const mobileSpacing = await table.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const cell = getComputedStyle(element.querySelector('td'));
+    return { top: parseFloat(style.marginTop), bottom: parseFloat(style.marginBottom), cell: parseFloat(cell.paddingTop) };
+  });
+  expect(mobileSpacing).toEqual({ top: 20, bottom: 26, cell: 12 });
+  const widths = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, page: document.documentElement.scrollWidth }));
+  expect(widths.page).toBeLessThanOrEqual(widths.viewport);
+});
+
 for (const chapter of siteData.chapters) {
   test(`practice chapter ${chapter.id} evaluates its original questions`, async ({ page }) => {
     await open(page, `practice/${chapter.id}/`);

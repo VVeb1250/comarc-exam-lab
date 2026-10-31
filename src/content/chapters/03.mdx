@@ -155,45 +155,26 @@ MUX คือสวิตช์เลือกข้อมูลจากหล�
 
 นี่คือวิธีหลักที่ใช้แก้ข้อ 3
 
-**โซน A**
-
-เปิด / ปิดการทำงาน
-
----
-
-PCWrite
-
-PCWriteCond
-
-MemWrite
-
-MemRead
-
-IRWrite
-
-RegWrite
-
-**โซน B**
-
-เลือกเส้นทางข้อมูล
-
----
-
-PCSource
-
-IorD
-
-MemToReg
-
-RegDst
-
-ALUOp
-
-ALUSrcA
-
-ALUSrcB
-
-Next State
+<div className="zone-wrap control-zone-wrap">
+  <div className="zone zone-a">
+    <div className="zone-title"><span className="dot" />โซน A</div>
+    <p className="zone-description">เปิด / ปิดการทำงาน</p>
+    <div className="zone-signal-list">
+      {['PCWrite', 'PCWriteCond', 'MemWrite', 'MemRead', 'IRWrite', 'RegWrite'].map((signal) => (
+        <div className="zone-signal" key={signal}><code>{signal}</code></div>
+      ))}
+    </div>
+  </div>
+  <div className="zone zone-b">
+    <div className="zone-title"><span className="dot" />โซน B</div>
+    <p className="zone-description">เลือกเส้นทางข้อมูล</p>
+    <div className="zone-signal-list">
+      {['PCSource', 'IorD', 'MemToReg', 'RegDst', 'ALUOp', 'ALUSrcA', 'ALUSrcB', 'Next State'].map((signal) => (
+        <div className="zone-signal" key={signal}><code>{signal}</code></div>
+      ))}
+    </div>
+  </div>
+</div>
 
 โซน A ถามว่า *ต้องอ่านหรือเขียนอะไรใน State นี้?* ถ้าไม่ได้ใช้งาน ให้ใส่ 0
 
