@@ -21,22 +21,18 @@ export const chapterInfo = {
     },
     {
       "id": "ch2-section-3",
-      "title": "0010 = 2"
-    },
-    {
-      "id": "ch2-section-4",
       "title": "2.3 แล้ว NOR และ SLT ทำอย่างไร?"
     },
     {
-      "id": "ch2-section-5",
+      "id": "ch2-section-4",
       "title": "2.4 ทดลองเลือก Operation"
     },
     {
-      "id": "ch2-section-6",
+      "id": "ch2-section-5",
       "title": "2.5 ALUOp กับ Funct ต่างจาก Operation อย่างไร?"
     },
     {
-      "id": "ch2-section-7",
+      "id": "ch2-section-6",
       "title": "2.6 เฉลยตารางที่ 1 ครบทุกข้อ"
     }
   ]
@@ -87,31 +83,21 @@ ALU (Arithmetic Logic Unit) รับ Operand A และ B แล้วคำ�
 
 ตัวอย่าง 5−3 แบบ 4-bit
 
-A **0101 (5)**
+<div className="alu-subtraction-example" role="group" aria-label="ตัวอย่าง 5 ลบ 3 แบบ 4-bit">
+  <div className="alu-example-row"><span>A</span><strong>0101 (5)</strong></div>
+  <div className="alu-example-row"><span>B</span><strong>0011 (3)</strong></div>
+  <div className="alu-example-arrow" aria-hidden="true">↓</div>
+  <div className="alu-example-row"><span>Binv = 1 ทำให้ B กลายเป็น</span><strong>1100</strong></div>
+  <div className="alu-example-row"><span>CarryIn</span><strong>0001</strong></div>
+  <hr />
+  <div className="alu-example-result"><strong>0101 + 1100 + 1</strong><strong className="good">0010 = 2</strong></div>
+</div>
 
-B **0011 (3)**
-
-Binv = 1 ทำให้ B กลายเป็น **1100**
-
-CarryIn **0001**
-
----
-
-**0101 + 1100 + 1**
+จึงเลือก `Ainv=0`, `Binv=1`, `CarryIn=1`, `Operation=10`
 
 </section>
 
 <section className="lesson-section" id="ch2-section-3">
-
-## 0010 = 2
-
-จึงเลือก
-
-`Ainv=0`, `Binv=1`, `CarryIn=1`, `Operation=10`
-
-</section>
-
-<section className="lesson-section" id="ch2-section-4">
 
 ## 2.3 แล้ว NOR และ SLT ทำอย่างไร?
 
@@ -135,15 +121,15 @@ Set จะถูกส่งกลับไปยัง Less input ของ ALU
 
 </section>
 
-<section className="lesson-section" id="ch2-section-5">
+<section className="lesson-section" id="ch2-section-4">
 
 ## 2.4 ทดลองเลือก Operation
 
-<AluExplorer client:load />
+<AluExplorer client:load referenceLayout />
 
 </section>
 
-<section className="lesson-section" id="ch2-section-6">
+<section className="lesson-section" id="ch2-section-5">
 
 ## 2.5 ALUOp กับ Funct ต่างจาก Operation อย่างไร?
 
@@ -171,7 +157,7 @@ Decode ว่าต้องการ ADD / SUB / ...
 
 </section>
 
-<section className="lesson-section" id="ch2-section-7">
+<section className="lesson-section" id="ch2-section-6">
 
 ## 2.6 เฉลยตารางที่ 1 ครบทุกข้อ
 

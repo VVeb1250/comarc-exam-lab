@@ -92,19 +92,23 @@ lw $t0, 12($s1)
 
 เป้าหมายคือทำให้ `$t0=77`
 
-**State 0: Instruction Fetch**
-
-`IR ← Memory[PC]`
-
-`PC ← PC+4`
-
-**State 1: Address Calculation**
-
-`ALUOut ← 1000+12 = 1012`
-
-**State 2: Load + Write Back**
-
-`$t0 ← Memory[1012] = 77`
+<div className="multicycle-state-flow" role="group" aria-label="lw ผ่าน State 0 ถึง State 2">
+  <div className="multicycle-state-step">
+    <strong>State 0: Instruction Fetch</strong>
+    <code>IR ← Memory[PC]</code>
+    <code>PC ← PC+4</code>
+  </div>
+  <div className="multicycle-state-arrow" aria-hidden="true">↓</div>
+  <div className="multicycle-state-step address-step">
+    <strong>State 1: Address Calculation</strong>
+    <code>ALUOut ← 1000+12 = 1012</code>
+  </div>
+  <div className="multicycle-state-arrow" aria-hidden="true">↓</div>
+  <div className="multicycle-state-step load-step">
+    <strong>State 2: Load + Write Back</strong>
+    <code>$t0 ← Memory[1012] = 77</code>
+  </div>
+</div>
 
 **ทำไมต้องมี ALUOut?** เพราะ State 1 คำนวณ Address 1012 แล้ว State 2 จึงนำ Address นั้นไปใช้ ถ้าไม่มีที่พักผลข้าม Clock เราอาจรักษาค่าที่ต้องการไว้ไม่ได้
 

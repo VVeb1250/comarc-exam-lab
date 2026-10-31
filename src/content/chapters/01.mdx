@@ -116,7 +116,14 @@ Invert bits **0100**
 
 สำหรับ Signed Addition ให้ตรวจเครื่องหมาย
 
-สำหรับ Unsigned Addition ให้ดู Carry out จากบิตที่ 4 ส่วน Signed ต้องพิจารณาเครื่องหมายของ Operand และ Result
+<div className="overflow-patterns" role="group" aria-label="รูปแบบ Signed Overflow">
+  <div className="overflow-pattern-grid">
+    <div><strong>+ +</strong><span>กลายเป็นลบ</span><b className="bad">Overflow</b></div>
+    <div><strong>− −</strong><span>กลายเป็นบวก</span><b className="bad">Overflow</b></div>
+    <div><strong>+ −</strong><span>อยู่ในช่วง</span><b className="good">ไม่ Overflow</b></div>
+  </div>
+  <p>สำหรับ Unsigned Addition ให้ดู Carry out จากบิตที่ 4 ส่วน Signed ต้องพิจารณาเครื่องหมายของ Operand และ Result</p>
+</div>
 
 ตัวอย่างสำคัญคือข้อ 1.6
 
@@ -137,7 +144,7 @@ Invert bits **0100**
 
 ## 1.4 ทดลองโจทย์ทุกข้อ
 
-<AdditionExplorer client:load />
+<AdditionExplorer client:load referenceLayout />
 
 </section>
 

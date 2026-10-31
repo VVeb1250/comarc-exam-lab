@@ -112,23 +112,30 @@ Main Control สร้าง Control ใน ID แล้วแบ่งเป็
 
 </div>
 
-**ID: Main Control**
-
-สร้าง EX, M, WB Controls
-
-**ID/EX Register**
-
-**EX ใช้ EX Controls**
-
-**EX/MEM Register**
-
-**MEM ใช้ M Controls**
-
-**MEM/WB Register**
-
-**WB**
-
-**WB ใช้ WB Controls**
+<div className="control-pipeline-flow" role="group" aria-label="Control Signals ผ่าน Pipeline Registers">
+  <div className="control-origin"><strong>ID: Main Control</strong><span>สร้าง EX, M, WB Controls</span></div>
+  <div className="control-flow-arrow" aria-hidden="true">↓</div>
+  <div className="control-register id-ex-register">
+    <strong>ID/EX Register</strong>
+    <div className="control-register-bits"><span>EX</span><span className="m">M</span><span className="wb">WB</span></div>
+  </div>
+  <div className="control-flow-arrow" aria-hidden="true">↓</div>
+  <div className="control-use ex-use"><strong>EX ใช้ EX Controls</strong></div>
+  <div className="control-flow-arrow" aria-hidden="true">↓</div>
+  <div className="control-register ex-mem-register">
+    <strong>EX/MEM Register</strong>
+    <div className="control-register-bits two"><span className="m">M</span><span className="wb">WB</span></div>
+  </div>
+  <div className="control-flow-arrow" aria-hidden="true">↓</div>
+  <div className="control-use mem-use"><strong>MEM ใช้ M Controls</strong></div>
+  <div className="control-flow-arrow" aria-hidden="true">↓</div>
+  <div className="control-register mem-wb-register">
+    <strong>MEM/WB Register</strong>
+    <div className="control-register-bits one"><span className="wb">WB</span></div>
+  </div>
+  <div className="control-flow-arrow" aria-hidden="true">↓</div>
+  <div className="control-use wb-use"><strong>WB ใช้ WB Controls</strong></div>
+</div>
 
 ทำไมสัญญาณจึงค่อย ๆ ลดลง?
 

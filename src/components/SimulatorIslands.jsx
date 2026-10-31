@@ -41,7 +41,7 @@ function FlowDiagram({ nodes, colors = ['var(--blue)', 'var(--teal)', 'var(--tea
 }
 
 function SimulatorTitle({ children, detail }) {
-  return <div className="simulator-title"><b>{children}</b><span>{detail}</span></div>;
+  return <div className="simulator-title"><b>{children}</b>{detail && <span>{detail}</span>}</div>;
 }
 
 export function SignedInterpretation() {
@@ -83,19 +83,21 @@ function DataTable({ head, rows, compact = false }) {
   );
 }
 
-export function AdditionExplorer() {
+export function AdditionExplorer({ referenceLayout = false }) {
   const [index, setIndex] = useState(5);
   const { row, a, b, sum, result, overflow, min, max } = calculateAddition(index);
   return (
-    <div className="simulator">
-      <SimulatorTitle detail="Addition 4-bit">4-bit Addition Explorer</SimulatorTitle>
+    <div className={`simulator${referenceLayout ? ' addition-explorer' : ''}`}>
+      <SimulatorTitle detail={referenceLayout ? undefined : 'Addition 4-bit'}>4-bit Addition Explorer</SimulatorTitle>
       <div className="step-buttons wrap">
         {additionCases.map((item, itemIndex) => (
           <Chip key={item[0]} active={index === itemIndex} onClick={() => setIndex(itemIndex)}>{item[0]}</Chip>
         ))}
       </div>
-      <div className="sim-stage">
-        <div className="sim-hint"><b>Addition</b> 4-bit · {row[1]} · Range: {min} ถึง {max}</div>
+      <div className={referenceLayout ? 'addition-stage' : 'sim-stage'}>
+        {referenceLayout
+          ? <div className="addition-mode"><b>{row[1]} Addition</b><span>4-bit</span></div>
+          : <div className="sim-hint"><b>Addition</b> 4-bit · {row[1]} · Range: {min} ถึง {max}</div>}
         <div className="operand-grid">
           <div><small>Operand 1</small><b>{row[2]}</b><span>= {a}</span></div>
           <div><small>Operand 2</small><b>{row[3]}</b><span>= {b}</span></div>
@@ -113,9 +115,11 @@ export function AdditionExplorer() {
   );
 }
 
-export function AluExplorer() {
+export function AluExplorer({ referenceLayout = false }) {
+  const operations = ['ADD', 'SUB', 'AND', 'OR', 'NOR', 'SLT'];
   const [index, setIndex] = useState(7);
-  const row = aluCases[index];
+  const [operation, setOperation] = useState('SLT');
+  const row = referenceLayout ? aluCases.find((item) => item[3] === operation) : aluCases[index];
   const explanations = {
     ADD: 'Adder รับ A และ B ตามเดิม ไม่ต้องกลับบิต',
     SUB: 'ใช้ A + NOT(B) + 1 จึงเปิด Binv และ CarryIn',
@@ -125,16 +129,16 @@ export function AluExplorer() {
     SLT: 'ใช้การลบ A−B และส่ง Set ที่แก้ signed overflow แล้วไปยัง LESS ของบิตต่ำสุด',
   };
   return (
-    <div className="simulator">
-      <SimulatorTitle detail="ตารางที่ 1">ALU Control Explorer</SimulatorTitle>
+    <div className={`simulator${referenceLayout ? ' alu-explorer' : ''}`}>
+      <SimulatorTitle detail={referenceLayout ? undefined : 'ตารางที่ 1'}>ALU Control Explorer</SimulatorTitle>
       <div className="step-buttons wrap">
-          {aluCases.map((item, itemIndex) => (
-          <Chip key={item[0]} active={index === itemIndex} onClick={() => setIndex(itemIndex)}>{item[3]}</Chip>
-        ))}
+        {referenceLayout
+          ? operations.map((item) => <Chip key={item} active={operation === item} onClick={() => setOperation(item)}>{item}</Chip>)
+          : aluCases.map((item, itemIndex) => <Chip key={item[0]} active={index === itemIndex} onClick={() => setIndex(itemIndex)}>{item[3]}</Chip>)}
       </div>
-      <div className="sim-stage">
-        <div className="mini-label">ALUOp {row[1]} · Funct {row[2]} · Goal {row[3]}</div>
-        <div className="signal-grid">
+      <div className={referenceLayout ? 'alu-stage' : 'sim-stage'}>
+        {!referenceLayout && <div className="mini-label">ALUOp {row[1]} · Funct {row[2]} · Goal {row[3]}</div>}
+        <div className="signal-grid" role={referenceLayout ? 'group' : undefined} aria-label={referenceLayout ? `ALUOp ${row[1]}, Funct ${row[2]}, Operation ${row[7]}` : undefined}>
           {['Ainv', 'Binv', 'CarryIn', 'Operation'].map((field, fieldIndex) => (
             <div className={`signal-card ${row[fieldIndex + 4] === '1' ? 'on' : ''}`} key={field}>
               <small>{field}</small><b>{row[fieldIndex + 4]}</b>

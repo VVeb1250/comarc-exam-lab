@@ -252,27 +252,25 @@ I2 ยังต้องการ `$s0` เช่นเดิม แต่ตอ
 
 ค่าที่ต้องการไม่ได้ออกจาก ALU ทันที เพราะ ALU เพียงคำนวณ Address ส่วนข้อมูลจริงต้องอ่านจาก Memory ใน MEM Stage
 
-เปรียบเทียบเวลาที่ข้อมูลพร้อม
-
-**ALU → ALU**
-
-I1 คำนวณ EX ที่ Clock 3
-
----
-
-I2 ใช้ค่าใน EX ที่ Clock 4
-
-Forward ได้ทัน
-
-**Load → ALU**
-
-I1 ได้ Data หลัง MEM Clock 4
-
----
-
-I2 ต้องการค่าใน EX Clock 4
-
-Forward ไม่ทัน
+<div className="ready-comparison" role="group" aria-label="เปรียบเทียบเวลาที่ข้อมูลพร้อม">
+  <strong>เปรียบเทียบเวลาที่ข้อมูลพร้อม</strong>
+  <div className="ready-comparison-grid">
+    <div>
+      <b>ALU → ALU</b>
+      <p>I1 คำนวณ EX ที่ Clock 3</p>
+      <hr />
+      <p>I2 ใช้ค่าใน EX ที่ Clock 4</p>
+      <strong className="good">Forward ได้ทัน</strong>
+    </div>
+    <div>
+      <b>Load → ALU</b>
+      <p>I1 ได้ Data หลัง MEM Clock 4</p>
+      <hr />
+      <p>I2 ต้องการค่าใน EX Clock 4</p>
+      <strong className="bad">Forward ไม่ทัน</strong>
+    </div>
+  </div>
+</div>
 
 นี่คือ **Load-Use Hazard** ซึ่งเป็น Data Hazard แบบ RAW ชนิดหนึ่ง
 

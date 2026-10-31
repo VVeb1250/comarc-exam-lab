@@ -53,6 +53,56 @@ test('all six approved study chapters render their headings and source figures',
   await expect(page.getByRole('dialog', { name: 'ขยายภาพ' })).toHaveCount(0);
 });
 
+test('lesson illustrations keep the reference layouts across all six chapters', async ({ page }) => {
+  await open(page, 'study/1/');
+  const overflow = page.locator('#ch1-section-3 .overflow-patterns');
+  await expect(overflow.locator('.overflow-pattern-grid > div')).toHaveCount(3);
+  await expect(overflow).toHaveCSS('border-top-width', '1px');
+  await expect(overflow.locator('> p')).toContainText('Signed ต้องพิจารณาเครื่องหมาย');
+  await expect(page.locator('#ch1-section-4 .addition-explorer .sim-stage')).toHaveCount(0);
+  await expect(page.locator('#ch1-section-4 .addition-explorer .result-bar')).toHaveCSS('border-top-width', '1px');
+
+  await open(page, 'study/2/');
+  await expect(page.locator('#ch2-section-2 .alu-subtraction-example .alu-example-result strong')).toHaveCount(2);
+  await expect(page.locator('#ch2-section-3 h2')).toHaveText('2.3 แล้ว NOR และ SLT ทำอย่างไร?');
+  await expect(page.locator('#ch2-section-4 .alu-explorer .step-buttons button')).toHaveText(['ADD', 'SUB', 'AND', 'OR', 'NOR', 'SLT']);
+  await expect(page.locator('#ch2-section-4 .alu-explorer .sim-stage')).toHaveCount(0);
+
+  await open(page, 'study/3/');
+  await expect(page.locator('.multicycle-state-flow .multicycle-state-step')).toHaveCount(3);
+  await expect(page.locator('.multicycle-state-flow .address-step')).toHaveCSS('border-top-width', '1px');
+  const zones = page.locator('#ch3-section-3 .control-zone-wrap .zone');
+  await expect(zones).toHaveCount(2);
+  await expect(zones.first()).toHaveCSS('border-top-width', '1px');
+  await expect(zones.first().locator('.zone-title svg')).toHaveCSS('width', '18px');
+  await expect(zones.first().locator('.zone-signal code').first()).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(zones.first().locator('.zone-description')).toHaveCSS('border-bottom-width', '1px');
+
+  await open(page, 'study/4/');
+  await expect(page.locator('#page .source-figure.loaded')).toHaveCount(1);
+  await expect(page.locator('#ch4-section-3 .simulator')).toHaveCount(1);
+
+  await open(page, 'study/5/');
+  await expect(page.locator('.ready-comparison-grid > div')).toHaveCount(2);
+  await expect(page.locator('.ready-comparison-grid > div hr')).toHaveCount(2);
+
+  await open(page, 'study/6/');
+  const flow = page.locator('#ch6-section-3 .control-pipeline-flow');
+  const signalsTable = page.locator('#ch6-section-3 .table-scroll');
+  await expect(signalsTable).toHaveCSS('border-top-width', '0px');
+  await expect(signalsTable.locator('th').first()).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(flow.locator('.control-register')).toHaveCount(3);
+  await expect(flow.locator('.control-use')).toHaveCount(3);
+  await expect(flow.locator('.control-register-bits').nth(0).locator('span')).toHaveCount(3);
+  await expect(flow.locator('.control-register-bits').nth(1).locator('span')).toHaveCount(2);
+  await expect(flow.locator('.control-register-bits').nth(2).locator('span')).toHaveCount(1);
+  const registerColors = await flow.locator('.control-register').evaluateAll((registers) => registers.map((register) => [...new Set([...register.querySelectorAll('.control-register-bits span')].map((chip) => getComputedStyle(chip).backgroundColor))]));
+  expect(registerColors.map((colors) => colors.length)).toEqual([1, 1, 1]);
+  expect(new Set(registerColors.map((colors) => colors[0])).size).toBe(3);
+  const useColors = await flow.locator('.control-use').evaluateAll((stages) => stages.map((stage) => getComputedStyle(stage).backgroundColor));
+  expect(useColors).toEqual(registerColors.map((colors) => colors[0]));
+});
+
 test('multicycle controls and lesson tables have breathing room on desktop and mobile', async ({ page }) => {
   await open(page, 'study/3/');
   const zones = page.locator('#ch3-section-3 .control-zone-wrap');
@@ -132,9 +182,13 @@ test('adder, ALU, multicycle control, shifter, hazards, and pipeline controls re
   await open(page, 'study/2/');
   const alu = page.locator('.simulator').first();
   await expect(alu.getByRole('button', { name: 'SLT', exact: true })).toHaveClass(/active/);
-  for (const [index, row] of siteData.aluCases.entries()) {
-    await alu.locator('.step-buttons').first().locator('button').nth(index).click();
-    await expect(alu.locator('.mini-label')).toContainText(`Funct ${row[2]}`);
+  for (const operation of ['ADD', 'SUB', 'AND', 'OR', 'NOR', 'SLT']) {
+    const row = siteData.aluCases.find((item) => item[3] === operation);
+    await alu.getByRole('button', { name: operation, exact: true }).click();
+    await expect(alu.getByRole('button', { name: operation, exact: true })).toHaveClass(/active/);
+    await expect(alu.locator('.signal-card').nth(0).locator('b')).toHaveText(row[4]);
+    await expect(alu.locator('.signal-card').nth(1).locator('b')).toHaveText(row[5]);
+    await expect(alu.locator('.signal-card').nth(2).locator('b')).toHaveText(row[6]);
     await expect(alu.locator('.signal-card').nth(3).locator('b')).toHaveText(row[7]);
   }
 
@@ -195,6 +249,8 @@ test('practice answers persist, progress updates, theme changes, and diagrams zo
   await page.getByRole('button', { name: 'เปลี่ยนธีม' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.locator('#theme-text')).toHaveText('Dark');
+  await expect.poll(() => page.locator('html').evaluate((element) => getComputedStyle(element).getPropertyValue('--bg').trim())).toBe('#000');
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#000');
   await page.getByRole('button', { name: 'เพิ่มขนาดตัวอักษร' }).click();
   await expect.poll(() => page.locator('html').evaluate((element) => getComputedStyle(element).getPropertyValue('--font-scale').trim())).toBe('1.05');
 

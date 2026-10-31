@@ -8,7 +8,7 @@ function applyAppearance(theme, font) {
   document.documentElement.setAttribute('data-theme', actualTheme);
   document.documentElement.style.setProperty('--font-scale', font);
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.content = actualTheme === 'dark' ? '#0f1621' : '#f7f9fc';
+  if (meta) meta.content = actualTheme === 'dark' ? '#000' : '#f7f9fc';
 }
 
 export default function ReaderControls() {

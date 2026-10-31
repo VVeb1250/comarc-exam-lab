@@ -35,7 +35,8 @@ describe('preserved lesson editions', () => {
     it(`keeps approved source headings and SVG artwork for chapter ${id}`, () => {
       const mdx = readFileSync(chapterPath(id), 'utf8');
       const source = referenceChapter(id);
-      const sourceHeadings = [...source.matchAll(/^## (.*)$/gm)].map((match) => normalized(match[1])).filter((heading) => heading !== 'bits');
+      // The shared visual places the subtraction result inside its example card, not as a section heading.
+      const sourceHeadings = [...source.matchAll(/^## (.*)$/gm)].map((match) => normalized(match[1])).filter((heading) => !['bits', '0010 = 2'].includes(heading));
       const mdxInfo = chapterInfo(mdx);
       expect(normalized(mdxInfo.title)).toBe(normalized(source.match(/^# (.*)$/m)[1]));
       expect(mdxInfo.sections.map((section) => normalized(section.title))).toEqual(sourceHeadings);
@@ -64,7 +65,7 @@ describe('preserved lesson editions', () => {
   it('keeps the reference interactive controls in the React islands', () => {
     const islands = readFileSync(fileURLToPath(new URL('../../src/components/SimulatorIslands.jsx', import.meta.url)), 'utf8');
     for (const label of [
-      'Signed', 'Unsigned', '4-bit Addition Explorer', 'Addition 4-bit', 'Operand 1', 'Operand 2', 'Result (4-bit)',
+      'Signed', 'Unsigned', '4-bit Addition Explorer', 'addition-mode', '4-bit', 'Operand 1', 'Operand 2', 'Result (4-bit)',
       'ALU Control Explorer', 'Multicycle Control Explorer', 'ตารางที่ 4', 'สิ่งที่ CPU ทำใน State นี้',
       'โซน A: เปิด/ปิด', 'โซน B: เลือกเส้นทาง', 'Barrel Shifter Simulator', 'Shift Amount', 'Data out',
       '5-Stage Pipeline', 'Pipeline Control Explorer',
