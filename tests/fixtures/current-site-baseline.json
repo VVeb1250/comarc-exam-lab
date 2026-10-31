@@ -26,7 +26,7 @@
           "title": "5. เฉลยข้อ 1.1–1.8"
         }
       ],
-      "text_sha256": "a97a2820d75b7c4868e35a48e0c8359cd5b3b8acd53fefcc3f6520daff5a6785",
+      "text_sha256": "31e9e0bfd6f02f72c7cd55b282c2828c48dc0157c4a20b45674e9bbdd07955e3",
       "text_chars": 2856,
       "svg_sha256": [],
       "static_svg_sha256": []
@@ -61,7 +61,7 @@
           "title": "6. เฉลยตารางที่ 1"
         }
       ],
-      "text_sha256": "b28f626fa6385073113e6f489319db05bb6b3dad148300784b724740ef6d92ba",
+      "text_sha256": "3c89d3657614105f7d7d43d07a7f923f1f674c5c272ca9343469fa426d647497",
       "text_chars": 2990,
       "svg_sha256": [
         "02f61555ecb26275d8e261a32e4c3b5a3e25307ee464c9c4e8484634588e0016",
@@ -116,7 +116,7 @@
           "title": "8. เฉลยตารางที่ 3 และ 4 ทั้งหมด"
         }
       ],
-      "text_sha256": "20185feddee43edccbc06b8372f20befd54c6098861e87242125c710692dab7d",
+      "text_sha256": "fe80da50474f91f630d8cc906cb2180b44eb03ac4effb12c684430de084cbe0c",
       "text_chars": 6818,
       "svg_sha256": [
         "11ffd9042726f2fd7ede77428353a093bba2d0bff29b9ac5203d0c5d9ba7f7b8",
@@ -154,7 +154,7 @@
           "title": "4. วาดสายเชื่อมอุปกรณ์ทีละจุด"
         }
       ],
-      "text_sha256": "1b277216da65667c9371c742fec62540575a3cdeefef00cf3f6b3fce7955ff8b",
+      "text_sha256": "1a73ffea264513c3095c11503032244546ecfdd659797af35b3cd128db187683",
       "text_chars": 3225,
       "svg_sha256": [
         "afdd0ebfceb24765f2c1eeddaff8413afc3958ba125e7c55af771bc6834d2714"
@@ -197,7 +197,7 @@
           "title": "7. เฉลยข้อ 5.1–5.10"
         }
       ],
-      "text_sha256": "2cb5028384d36e5013c41e542c93859565e9fe182beaeecf8b18d1b78b6259ff",
+      "text_sha256": "eac957559381da33180a88862f6ee803295dbdff4c00a06f9df2fbce37c8e8f6",
       "text_chars": 4919,
       "svg_sha256": [
         "e89b55d99d4c2c46a75757864ec84fc60ffe5dd699105ba3bb87822921732944",
@@ -239,7 +239,7 @@
           "title": "6. คำตอบข้อสอบข้อ 6"
         }
       ],
-      "text_sha256": "9cd06f8f20598421093942c3d3a99958143f6fc43541ac59042df013e8e5340f",
+      "text_sha256": "06894f26454266ba354b9d513c5f37495336ecaa22825bbb54ea8b63246bbeff",
       "text_chars": 4043,
       "svg_sha256": [],
       "static_svg_sha256": []
