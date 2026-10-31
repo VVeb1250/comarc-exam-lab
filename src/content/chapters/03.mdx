@@ -165,7 +165,7 @@ MUX คือสวิตช์เลือกข้อมูลจากหล�
 
 <div className="zone-wrap control-zone-wrap">
   <div className="zone zone-a">
-    <div className="zone-title"><span className="dot" />โซน A</div>
+    <div className="zone-title"><svg className="zone-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="#5285db" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v10"/><path d="M18.4 6.6a8 8 0 1 1-12.8 0"/></svg><span>โซน A</span></div>
     <p className="zone-description">เปิด / ปิดการทำงาน</p>
     <div className="zone-signal-list">
       {['PCWrite', 'PCWriteCond', 'MemWrite', 'MemRead', 'IRWrite', 'RegWrite'].map((signal) => (
@@ -174,7 +174,7 @@ MUX คือสวิตช์เลือกข้อมูลจากหล�
     </div>
   </div>
   <div className="zone zone-b">
-    <div className="zone-title"><span className="dot" />โซน B</div>
+    <div className="zone-title"><svg className="zone-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4"/><path d="m8.6 13.5 6.8 4"/></svg><span>โซน B</span></div>
     <p className="zone-description">เลือกเส้นทางข้อมูล</p>
     <div className="zone-signal-list">
       {['PCSource', 'IorD', 'MemToReg', 'RegDst', 'ALUOp', 'ALUSrcA', 'ALUSrcB', 'Next State'].map((signal) => (

@@ -1,6 +1,7 @@
 import { AluExplorer } from '../../components/SimulatorIslands.jsx';
 import ChapterCompletion from '../../components/ChapterCompletion.jsx';
 import SourceFigure from '../../components/SourceFigure.jsx';
+import SvgBlock from '../../components/SvgBlock.jsx';
 import MathBlock from '../../components/MathBlock.jsx';
 
 export const chapterInfo = {
@@ -51,6 +52,8 @@ export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 ## 2.1 ALU เป็นเครื่องคำนวณที่เลือกโหมดได้
 
 ALU (Arithmetic Logic Unit) รับ Operand A และ B แล้วคำนวณผลตาม Control Signals เช่น ADD, SUB, AND, OR, NOR และ SLT
+
+<SvgBlock label="ALU รับ Operand A และ B กับ Control แล้วส่ง Result ออกมา" source={"<svg viewBox=\"0 0 340 171\" width=\"100%\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"112\" y=\"24\" width=\"112\" height=\"114\" rx=\"10\" fill=\"#5285db\" fill-opacity=\".12\" stroke=\"#5285db\" stroke-width=\"1.8\"/><text x=\"168\" y=\"73\" font-size=\"24\" font-weight=\"700\" fill=\"currentColor\" text-anchor=\"middle\">ALU</text><text x=\"168\" y=\"96\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">32-bit</text><path d=\"M29 48H110M29 116H110\" stroke=\"#5285db\" stroke-width=\"2.5\" fill=\"none\"/><text x=\"15\" y=\"52\" font-size=\"15\" fill=\"currentColor\">A</text><text x=\"15\" y=\"120\" font-size=\"15\" fill=\"currentColor\">B</text><path d=\"M224 79H324\" stroke=\"#0d9488\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M315 73L324 79L315 85\" stroke=\"#0d9488\" stroke-width=\"2\" fill=\"none\"/><text x=\"272\" y=\"65\" font-size=\"12\" fill=\"currentColor\" text-anchor=\"middle\">Result</text><path d=\"M168 166V139\" stroke=\"#d97706\" stroke-width=\"2.5\"/><text x=\"181\" y=\"159\" font-size=\"12\" fill=\"currentColor\">Control</text></svg>"} />
 
 ในรูปที่ 1 ของข้อสอบ เป็น ALU แบบ 32-bit ที่ประกอบจาก 1-bit ALU จำนวน 32 ตัวต่อกัน
 

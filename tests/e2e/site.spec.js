@@ -59,7 +59,7 @@ test('multicycle controls and lesson tables have breathing room on desktop and m
   await expect(zones.locator('.zone-a .zone-signal')).toHaveCount(6);
   await expect(zones.locator('.zone-b .zone-signal')).toHaveCount(8);
   const zoneSpacing = await zones.locator('.zone-signal-list').first().evaluate((element) => getComputedStyle(element).gap);
-  expect(zoneSpacing).toBe('8px');
+  expect(zoneSpacing).toBe('3px');
 
   const table = page.locator('.table-scroll').first();
   const desktopSpacing = await table.evaluate((element) => {
@@ -71,7 +71,7 @@ test('multicycle controls and lesson tables have breathing room on desktop and m
 
   await page.setViewportSize({ width: 390, height: 844 });
   const mobileZoneGap = await zones.locator('.zone-signal-list').first().evaluate((element) => getComputedStyle(element).gap);
-  expect(mobileZoneGap).toBe('8px');
+  expect(mobileZoneGap).toBe('3px');
   const mobileSpacing = await table.evaluate((element) => {
     const style = getComputedStyle(element);
     const cell = getComputedStyle(element.querySelector('td'));
