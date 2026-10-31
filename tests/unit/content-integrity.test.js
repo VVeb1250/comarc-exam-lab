@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 const baseline = JSON.parse(readFileSync(new URL('../fixtures/current-site-baseline.json', import.meta.url), 'utf8'));
 const reference = readFileSync(new URL('../fixtures/approved-shared-textbook.md', import.meta.url), 'utf8');
 const chapterPath = (id, directory = 'content/chapters') => fileURLToPath(new URL(`../../src/${directory}/${String(id).padStart(2, '0')}.mdx`, import.meta.url));
-const hash = (value) => createHash('sha256').update(value).digest('hex');
+const hash = (value) => createHash('sha256').update(value.replace(/\r\n?/g, '\n')).digest('hex');
 const normalized = (value) => value
   .replaceAll('&amp;', '&')
   .replaceAll('\\:', ':')
